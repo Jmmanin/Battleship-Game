@@ -63,6 +63,7 @@ public class BattleShipUI
    {
       private int mode;
       private int size;
+      private int xPos, yPos;
       
       public BSGrid(int s)
       {
@@ -72,17 +73,17 @@ public class BattleShipUI
          char rowChar= 'A';
          JLabel tempGridLabel= null;
          
-         this.setLayout(new GridLayout(size+1, size+1));
+         setLayout(new GridLayout(size+1, size+1/*, 1, 1*/)); //last 2 args provide spacing b/t images
          
          ImageIcon gridBG= new ImageIcon("ocean.png");
          
-         this.add(new JLabel());
+         add(new JLabel());
          
          for(int i=0;i<size;i++)
          {
             tempColLabel= new JLabel(Integer.toString(colNum));
             tempColLabel.setHorizontalAlignment((int)CENTER_ALIGNMENT);
-            this.add(tempColLabel);
+            add(tempColLabel);
             colNum++;
          }   
          
@@ -100,17 +101,32 @@ public class BattleShipUI
                tempGridLabel.setIcon(gridBG);
             }
                
-            this.add(tempGridLabel);
-         }   
+            add(tempGridLabel);
+         } 
+         
+         MouseHandler theMouse= new MouseHandler();
+         addMouseListener(theMouse);
       }
    
-      /*private class GridHandler extends ActionListener
+      private class MouseHandler extends MouseAdapter
       {
-         public void actionPerformed(ActionEvent e)
+         public void mouseClicked(MouseEvent e)
          {
-         
+            xPos= e.getX();
+            yPos= e.getY();
+            
+            System.out.println("X Position: " + xPos + "\nY Position: " + yPos);
+            
+            if((xPos>=30 && xPos<60) && (yPos>=30 && yPos<60))
+               System.out.println("Clicked A1\n");
+               
+            if((xPos>=270 && xPos<300) && (yPos>=30 && yPos<60))
+               System.out.println("Clicked A9\n");
+
+            if((xPos>=270 && xPos<300) && (yPos>=270 && yPos<300))
+               System.out.println("Clicked I9\n");
          }
-      }*/
+      }
    }
    
    public static void main(String[] args)
