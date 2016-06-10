@@ -16,7 +16,9 @@ public class BattleShipUI
    BSGrid yourGrid;
    JLabel yourLabel;
    JPanel statusPanel;
-   JLabel statusPlaceholder;
+   JLabel statusTurn;
+   JLabel statusTurnNum;
+   JLabel statusTime;
    
    public BattleShipUI()
    {
@@ -33,8 +35,19 @@ public class BattleShipUI
       yourLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
    
       statusPanel= new JPanel();
-      statusPlaceholder= new JLabel("Status Test");
-      statusPanel.add(statusPlaceholder);
+      statusPanel.setLayout(new GridLayout(1,3));
+      
+      statusTurn= new JLabel("Your Turn");
+      //statusTurn.setFont(
+      statusTurnNum= new JLabel("0 Turns");
+      statusTurnNum.setHorizontalAlignment(SwingConstants.CENTER);
+      statusTime= new JLabel("0:00");
+      statusTime.setHorizontalAlignment(SwingConstants.RIGHT);
+
+      statusPanel.add(statusTurn);
+      statusPanel.add(statusTurnNum);
+      statusPanel.add(statusTime);
+
       
       gameUI.add(enemyLabel);
       gameUI.add(enemyGrid);
