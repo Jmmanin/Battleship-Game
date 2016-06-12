@@ -43,12 +43,11 @@ public class BattleShipUI
       statusTurnNum.setHorizontalAlignment(SwingConstants.CENTER);
       statusTime= new JLabel("0:00");
       statusTime.setHorizontalAlignment(SwingConstants.RIGHT);
-
+   
       statusPanel.add(statusTurn);
       statusPanel.add(statusTurnNum);
       statusPanel.add(statusTime);
-
-      
+   
       gameUI.add(enemyLabel);
       gameUI.add(enemyGrid);
       gameUI.add(yourLabel);
@@ -68,44 +67,59 @@ public class BattleShipUI
       public BSGrid(int s)
       {
          size= s;
-         int colNum= 1;
-         JLabel tempColLabel;
+         JLabel tempLabel;
          char rowChar= 'A';
-         JLabel tempGridLabel= null;
          
-         setLayout(new GridLayout(size+1, size+1/*, 1, 1*/)); //last 2 args provide spacing b/t images
+         this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
          
-         ImageIcon gridBG= new ImageIcon("ocean.png");
+         JPanel colLabels= new JPanel();
+         colLabels.setLayout(new GridLayout(1,size+1));
          
-         add(new JLabel());
+         colLabels.add(new JLabel());
+         
+         for(int i=1;i<=size;i++)
+         {
+            tempLabel= new JLabel(Integer.toString(i));
+            tempLabel.setHorizontalAlignment((int)CENTER_ALIGNMENT);
+            colLabels.add(tempLabel);
+         }
+         
+         this.add(colLabels);
+         
+         JPanel rowAndGrid= new JPanel();
+         rowAndGrid.setLayout(new BoxLayout(rowAndGrid,BoxLayout.X_AXIS));
+         
+         JPanel rowLabels= new JPanel();
+         rowLabels.setLayout(new GridLayout(size,1));
          
          for(int i=0;i<size;i++)
          {
-            tempColLabel= new JLabel(Integer.toString(colNum));
-            tempColLabel.setHorizontalAlignment((int)CENTER_ALIGNMENT);
-            add(tempColLabel);
-            colNum++;
-         }   
+            tempLabel= new JLabel(Character.toString(rowChar));
+            tempLabel.setHorizontalAlignment((int)CENTER_ALIGNMENT);
+            rowChar++;   
+            rowLabels.add(tempLabel);
+         }
          
-         for(int i=0;i<(size*size+size);i++)
-         {
-            if(i%11==0)
-            {
-               tempGridLabel= new JLabel(Character.toString(rowChar));
-               tempGridLabel.setHorizontalAlignment((int)CENTER_ALIGNMENT);
-               rowChar++;
-            }
-            else
-            {   
-               tempGridLabel= new JLabel();
-               tempGridLabel.setIcon(gridBG);
-            }
-               
-            add(tempGridLabel);
-         } 
+         rowAndGrid.add(rowLabels);
+         
+         JPanel grid= new JPanel();
+         grid.setLayout(new GridLayout(size,size));
+
+         ImageIcon gridBG= new ImageIcon("ocean.png");
+
+         for(int i=0;i<(size*size);i++)
+         { 
+            tempLabel= new JLabel();
+            tempLabel.setIcon(gridBG);
+            grid.add(tempLabel);
+         }
          
          MouseHandler theMouse= new MouseHandler();
-         addMouseListener(theMouse);
+         grid.addMouseListener(theMouse);
+         
+         rowAndGrid.add(grid);
+         
+         this.add(rowAndGrid);                           
       }
    
       private class MouseHandler extends MouseAdapter
@@ -117,13 +131,13 @@ public class BattleShipUI
             
             System.out.println("X Position: " + xPos + "\nY Position: " + yPos);
             
-            if((xPos>=30 && xPos<60) && (yPos>=30 && yPos<60))
+            if((xPos>=0 && xPos<30) && (yPos>=0 && yPos<30))
                System.out.println("Clicked A1\n");
                
-            if((xPos>=270 && xPos<300) && (yPos>=30 && yPos<60))
+            if((xPos>=240 && xPos<270) && (yPos>=0 && yPos<30))
                System.out.println("Clicked A9\n");
-
-            if((xPos>=270 && xPos<300) && (yPos>=270 && yPos<300))
+         
+            if((xPos>=240 && xPos<270) && (yPos>=240 && yPos<270))
                System.out.println("Clicked I9\n");
          }
       }
