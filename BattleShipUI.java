@@ -24,6 +24,7 @@ public class BattleShipUI
    {
       gameUI= new JFrame("Battleship Game");
       gameUI.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      gameUI.setResizable(false);
       gameUI.getContentPane().setLayout(new BoxLayout(gameUI.getContentPane(), BoxLayout.Y_AXIS));
       
       enemyGrid= new BSGrid(10);
@@ -100,8 +101,12 @@ public class BattleShipUI
             rowLabels.add(tempLabel);
          }
          
+         rowAndGrid.add(Box.createRigidArea(new Dimension(11,0)));
+         
          rowAndGrid.add(rowLabels);
          
+         rowAndGrid.add(Box.createRigidArea(new Dimension(10,0)));
+                  
          JPanel grid= new JPanel();
          grid.setLayout(new GridLayout(size,size));
 
