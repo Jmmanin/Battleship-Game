@@ -10,15 +10,15 @@ import java.awt.event.*;
 
 public class BattleShipUI
 {
-   JFrame gameUI;
-   BSGrid enemyGrid;
-   JLabel enemyLabel;
-   BSGrid yourGrid;
-   JLabel yourLabel;
-   JPanel statusPanel;
-   JLabel statusTurn;
-   JLabel statusTurnNum;
-   JLabel statusTime;
+   private JFrame gameUI;
+   private BSGrid enemyGrid;
+   private JLabel enemyLabel;
+   private BSGrid yourGrid;
+   private JLabel yourLabel;
+   private JPanel statusPanel;
+   private JLabel statusTurn;
+   private JLabel statusTurnNum;
+   private JLabel statusTime;
    
    public BattleShipUI()
    {
