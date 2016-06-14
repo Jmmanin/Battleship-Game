@@ -59,7 +59,7 @@ public class BSGrid extends JPanel
       JPanel grid= new JPanel();
       grid.setLayout(new GridLayout(size,size));
    
-      ImageIcon gridBG= new ImageIcon("ocean.png");
+      ImageIcon gridBG= new ImageIcon("resources/ocean.png");
    
       for(int i=0;i<(size*size);i++)
       { 
@@ -93,6 +93,9 @@ public class BSGrid extends JPanel
       
          if((xPos>=240 && xPos<270) && (yPos>=240 && yPos<270))
             System.out.println("Clicked I9\n");
+            
+         JLabel temp= (JLabel)findComponentAt(xPos,yPos);
+         temp.setText("Hello");
       }
    }
 }
