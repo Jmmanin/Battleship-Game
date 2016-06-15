@@ -6,6 +6,7 @@ Jeremy Manin and John Dott
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
 public class BattleShipUI
 {
@@ -26,8 +27,10 @@ public class BattleShipUI
       gameUI.setResizable(false);
       gameUI.getContentPane().setLayout(new BoxLayout(gameUI.getContentPane(), BoxLayout.Y_AXIS));
       
-      enemyGrid= new BSGrid(10);
-      yourGrid= new BSGrid(10);
+      enemyGrid= new BSGrid(10,1);
+      enemyGrid.addMouseListener(new MouseHandler());
+      
+      yourGrid= new BSGrid(10,0);
       
       enemyLabel= new JLabel("Enemy Grid");
       enemyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -57,6 +60,26 @@ public class BattleShipUI
       gameUI.pack();
       gameUI.setVisible(true);
    }   
+   
+   private class MouseHandler extends MouseAdapter
+   {
+      public void mouseClicked(MouseEvent e)
+      {
+         int xPos= e.getX();
+         int yPos= e.getY();
+         
+         System.out.println("X Position: " + xPos + "\nY Position: " + yPos);
+         
+         if((xPos>=0 && xPos<30) && (yPos>=0 && yPos<30))
+            System.out.println("Clicked A1\n");
+            
+         if((xPos>=240 && xPos<270) && (yPos>=0 && yPos<30))
+            System.out.println("Clicked A9\n");
+      
+         if((xPos>=240 && xPos<270) && (yPos>=240 && yPos<270))
+            System.out.println("Clicked I9\n");
+      }
+   }
         
    public static void main(String[] args)
    {

@@ -14,9 +14,10 @@ public class BSGrid extends JPanel
    private int size;
    private int xPos, yPos;
    
-   public BSGrid(int s)
+   public BSGrid(int s, int m)
    {
       size= s;
+      mode= m;
       JLabel tempLabel;
       char rowChar= 'A';
       
@@ -67,35 +68,9 @@ public class BSGrid extends JPanel
          tempLabel.setIcon(gridBG);
          grid.add(tempLabel);
       }
-      
-      MouseHandler theMouse= new MouseHandler();
-      grid.addMouseListener(theMouse);
-      
+
       rowAndGrid.add(grid);
       
       this.add(rowAndGrid);                           
-   }
-
-   private class MouseHandler extends MouseAdapter
-   {
-      public void mouseClicked(MouseEvent e)
-      {
-         xPos= e.getX();
-         yPos= e.getY();
-         
-         System.out.println("X Position: " + xPos + "\nY Position: " + yPos);
-         
-         if((xPos>=0 && xPos<30) && (yPos>=0 && yPos<30))
-            System.out.println("Clicked A1\n");
-            
-         if((xPos>=240 && xPos<270) && (yPos>=0 && yPos<30))
-            System.out.println("Clicked A9\n");
-      
-         if((xPos>=240 && xPos<270) && (yPos>=240 && yPos<270))
-            System.out.println("Clicked I9\n");
-            
-         JLabel temp= (JLabel)findComponentAt(xPos,yPos);
-         temp.setText("Hello");
-      }
    }
 }
