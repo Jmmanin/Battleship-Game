@@ -41,7 +41,7 @@ public class PlaceShips
       gridPanel= new JPanel();
       gridPanel.setLayout(new BoxLayout(gridPanel,BoxLayout.X_AXIS));
       
-      theGrid= new BSGrid(10,0);
+      theGrid= new BSGrid(10);
       theGrid.addMouseListener(new GridMouser());
       
       gridPanel.add(Box.createRigidArea(new Dimension(84,0)));
@@ -116,7 +116,7 @@ public class PlaceShips
          
          System.out.println(xPos + " " + yPos);
          
-         if(xPos>=30 && yPos>=20)
+         if(xPos>=30 && yPos>=30)
          {
             if(shipSelected=="ba" && baPlaced==false)
             {

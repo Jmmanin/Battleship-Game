@@ -10,18 +10,42 @@ import java.awt.event.*;
 
 public class BSGrid extends JPanel
 {
-   private int mode;
    private int size;
    private int xPos, yPos;
    
-   public BSGrid(int s, int m)
+   public BSGrid(int s)
    {
       size= s;
-      mode= m;
       JLabel tempLabel;
+      ImageIcon gridBG= new ImageIcon("resources/ocean.png");
       char rowChar= 'A';
       
-      this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
+      setLayout(new GridLayout(11,11));
+      
+      add(new JLabel());
+      
+      for(int i= 1;i<=size;i++)
+      {
+         tempLabel= new JLabel(Integer.toString(i));
+         tempLabel.setHorizontalAlignment(SwingConstants.CENTER);
+         add(tempLabel);
+      }   
+
+      for(int i=0;i<size*size+size;i++)
+      {
+         if(i%11==0)
+         {
+            tempLabel= new JLabel(Character.toString(rowChar));
+            rowChar++;
+         }   
+         else
+            tempLabel= new JLabel(gridBG);
+         
+         tempLabel.setHorizontalAlignment(SwingConstants.CENTER);
+         add(tempLabel);
+      }
+            
+      /*this.setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
       
       JPanel colLabels= new JPanel();
       colLabels.setLayout(new GridLayout(1,size+1));
@@ -71,6 +95,6 @@ public class BSGrid extends JPanel
 
       rowAndGrid.add(grid);
       
-      this.add(rowAndGrid);                           
+      this.add(rowAndGrid);*/                           
    }
 }

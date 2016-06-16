@@ -27,10 +27,10 @@ public class BattleShipUI
       gameUI.setResizable(false);
       gameUI.getContentPane().setLayout(new BoxLayout(gameUI.getContentPane(), BoxLayout.Y_AXIS));
       
-      enemyGrid= new BSGrid(10,1);
+      enemyGrid= new BSGrid(10);
       enemyGrid.addMouseListener(new MouseHandler());
       
-      yourGrid= new BSGrid(10,0);
+      yourGrid= new BSGrid(10);
       
       enemyLabel= new JLabel("Enemy Grid");
       enemyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
