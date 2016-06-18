@@ -184,8 +184,8 @@ public class PlaceShips
                   imgName.append(i + ".png");
                   temp.setIcon(new ImageIcon(imgName.toString()));
                   imgName.delete(17,22);
-                  tempPoint.setLocation(tempPoint.getX()+30,tempPoint.getY());   
                   points[i-1]= new Point(tempPoint);
+                  tempPoint.setLocation(tempPoint.getX()+30,tempPoint.getY());   
                }
             }
             else
@@ -206,6 +206,7 @@ public class PlaceShips
                   imgName.append(i + ".png");
                   temp.setIcon(new ImageIcon(imgName.toString()));
                   imgName.delete(17,22);
+                  points[i-1]= new Point(tempPoint);
                   tempPoint.setLocation(tempPoint.getX(),tempPoint.getY()+30);   
                }
             }
