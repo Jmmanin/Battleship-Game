@@ -58,7 +58,7 @@ public class BattleShipUI
       gameUI.add(statusPanel);
       
       gameUI.pack();
-      gameUI.setVisible(true);
+      gameUI.setVisible(true);      
    }   
    
    private class MouseHandler extends MouseAdapter
@@ -69,6 +69,9 @@ public class BattleShipUI
          int yPos= e.getY();
          
          System.out.println("X Position: " + xPos + "\nY Position: " + yPos);
+         
+         xPos= xPos-30;
+         yPos= yPos-30;
          
          if((xPos>=0 && xPos<30) && (yPos>=0 && yPos<30))
             System.out.println("Clicked A1\n");

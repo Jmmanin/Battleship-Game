@@ -22,7 +22,9 @@ public class PlaceShips
    private JLabel submarine;
    private JButton orientation;
    private JLabel msgTxt;
+   private JButton done;
    private JLabel orientTxt;
+   
    private int shipOrientation;
    private String shipSelected;
    private boolean baPlaced;
@@ -30,6 +32,8 @@ public class PlaceShips
    private boolean crPlaced;
    private boolean dePlaced;
    private boolean suPlaced;
+   private int shipsAdded;
+   private Ship[] ships;
    
    public PlaceShips()
    {
@@ -81,13 +85,18 @@ public class PlaceShips
       theFrame.add(shipPanel);
       
       msgPanel= new JPanel();
-      msgPanel.setLayout(new GridLayout(1,2));
+      msgPanel.setLayout(new GridLayout(1,3));
       
       msgTxt= new JLabel("Select a ship to place.");
+      
+      done= new JButton("Done");
+      done.setEnabled(false);
+            
       orientTxt= new JLabel("Orientation: Horizontal");
       orientTxt.setHorizontalAlignment(SwingConstants.RIGHT);
       
       msgPanel.add(msgTxt);
+      msgPanel.add(done);
       msgPanel.add(orientTxt);
       
       theFrame.add(msgPanel);
@@ -101,179 +110,112 @@ public class PlaceShips
       crPlaced= false;
       dePlaced= false;
       suPlaced= false;
+      
+      shipsAdded= 0;
+      ships= new Ship[5];
    }
    
    private class GridMouser extends MouseAdapter
    {
       public void mouseClicked(MouseEvent e)
       {
-         int xPos= e.getX();
-         int yPos= e.getY();
+         Point clicked= new Point(e.getX(),e.getY());
+         Point topLeftCorner= new Point(30,30);
          StringBuilder imgName= new StringBuilder();
          int i;
                   
          imgName.append("resources/" + shipSelected + "_");
-         
-         System.out.println(xPos + " " + yPos);
-         
-         if(xPos>=30 && yPos>=30)
+                           
+         if(clicked.getX()>=topLeftCorner.getX() && clicked.getY()>=topLeftCorner.getY())
          {
             if(shipSelected=="ba" && baPlaced==false)
             {
-               if(shipOrientation==0)
-               {               
-                  imgName.append("hor_");
-               
-                  for(i=1;i<=4;i++)
-                  {
-                     JLabel temp= (JLabel)theGrid.findComponentAt(xPos,yPos);
-                     imgName.append(i + ".png");
-                     temp.setIcon(new ImageIcon(imgName.toString()));
-                     imgName.delete(17,22);
-                     xPos= xPos+30;   
-                  }
-               }
-               else
-               {
-                  imgName.append("ver_");
-               
-                  for(i=1;i<=4;i++)
-                  {
-                     JLabel temp= (JLabel)theGrid.findComponentAt(xPos,yPos);
-                     imgName.append(i + ".png");
-                     temp.setIcon(new ImageIcon(imgName.toString()));
-                     imgName.delete(17,22);
-                     yPos= yPos+30;   
-                  }
-               }
-            
-               baPlaced= true;
+               baPlaced= placeShip(imgName, clicked, shipOrientation, 4);
+               if(baPlaced==true)
+                  msgTxt.setText("Battleship placed");
             }
             else if(shipSelected=="ca" && caPlaced==false)
             {
-               if(shipOrientation==0)
-               {               
-                  imgName.append("hor_");
-               
-                  for(i=1;i<=5;i++)
-                  {
-                     JLabel temp= (JLabel)theGrid.findComponentAt(xPos,yPos);
-                     imgName.append(i + ".png");
-                     temp.setIcon(new ImageIcon(imgName.toString()));
-                     imgName.delete(17,22);
-                     xPos= xPos+30;   
-                  }
-               }
-               else
-               {
-                  imgName.append("ver_");
-               
-                  for(i=1;i<=5;i++)
-                  {
-                     JLabel temp= (JLabel)theGrid.findComponentAt(xPos,yPos);
-                     imgName.append(i + ".png");
-                     temp.setIcon(new ImageIcon(imgName.toString()));
-                     imgName.delete(17,22);
-                     yPos= yPos+30;   
-                  }
-               }
-            
-               caPlaced= true;
+               caPlaced= placeShip(imgName, clicked, shipOrientation, 5);
+               if(baPlaced==true)
+                  msgTxt.setText("Aircraft Carrier placed");
             }
             else if(shipSelected=="cr" && crPlaced==false)
             {
-               if(shipOrientation==0)
-               {               
-                  imgName.append("hor_");
-               
-                  for(i=1;i<=3;i++)
-                  {
-                     JLabel temp= (JLabel)theGrid.findComponentAt(xPos,yPos);
-                     imgName.append(i + ".png");
-                     temp.setIcon(new ImageIcon(imgName.toString()));
-                     imgName.delete(17,22);
-                     xPos= xPos+30;   
-                  }
-               }
-               else
-               {
-                  imgName.append("ver_");
-               
-                  for(i=1;i<=3;i++)
-                  {
-                     JLabel temp= (JLabel)theGrid.findComponentAt(xPos,yPos);
-                     imgName.append(i + ".png");
-                     temp.setIcon(new ImageIcon(imgName.toString()));
-                     imgName.delete(17,22);
-                     yPos= yPos+30;   
-                  }
-               }
-            
-               crPlaced= true;
+               crPlaced= placeShip(imgName, clicked, shipOrientation, 3);
+               if(baPlaced==true)
+                  msgTxt.setText("Cruiser placed");
             }
             else if(shipSelected=="de" && dePlaced==false)
             {
-               if(shipOrientation==0)
-               {               
-                  imgName.append("hor_");
-               
-                  for(i=1;i<=2;i++)
-                  {
-                     JLabel temp= (JLabel)theGrid.findComponentAt(xPos,yPos);
-                     imgName.append(i + ".png");
-                     temp.setIcon(new ImageIcon(imgName.toString()));
-                     imgName.delete(17,22);
-                     xPos= xPos+30;   
-                  }
-               }
-               else
-               {
-                  imgName.append("ver_");
-               
-                  for(i=1;i<=2;i++)
-                  {
-                     JLabel temp= (JLabel)theGrid.findComponentAt(xPos,yPos);
-                     imgName.append(i + ".png");
-                     temp.setIcon(new ImageIcon(imgName.toString()));
-                     imgName.delete(17,22);
-                     yPos= yPos+30;   
-                  }
-               }
-            
-               dePlaced= true;
+               dePlaced= placeShip(imgName, clicked, shipOrientation, 2);
+               if(baPlaced==true)
+                  msgTxt.setText("Destroyer placed");
             }
-            else if(shipSelected=="su" && suPlaced==false)
+            else if(shipSelected=="su" && suPlaced==false)            
             {
-               if(shipOrientation==0)
-               {               
-                  imgName.append("hor_");
-               
-                  for(i=1;i<=3;i++)
-                  {
-                     JLabel temp= (JLabel)theGrid.findComponentAt(xPos,yPos);
-                     imgName.append(i + ".png");
-                     temp.setIcon(new ImageIcon(imgName.toString()));
-                     imgName.delete(17,22);
-                     xPos= xPos+30;   
-                  }
-               }
-               else
-               {
-                  imgName.append("ver_");
-               
-                  for(i=1;i<=3;i++)
-                  {
-                     JLabel temp= (JLabel)theGrid.findComponentAt(xPos,yPos);
-                     imgName.append(i + ".png");
-                     temp.setIcon(new ImageIcon(imgName.toString()));
-                     imgName.delete(17,22);
-                     yPos= yPos+30;   
-                  }
-               }
-            
-               suPlaced= true;
+               suPlaced= placeShip(imgName, clicked, shipOrientation, 3);
+               if(baPlaced==true)
+                  msgTxt.setText("Submarine placed");
             }
          }
+         
+         if(shipsAdded==5)
+            done.setEnabled(true);
+      }
+      
+      public boolean placeShip(StringBuilder imgName, Point tempPoint, int orientation, int size)
+      {
+         Point[] points= new Point[size];
+         int i;
+         
+         if(orientation==0)
+         {
+            if(tempPoint.getX()<(330-((size-1)*30)))
+            {
+               imgName.append("hor_");
+               
+               for(i=1;i<=size;i++)
+               {
+                  JLabel temp= (JLabel)theGrid.findComponentAt(tempPoint);
+                  imgName.append(i + ".png");
+                  temp.setIcon(new ImageIcon(imgName.toString()));
+                  imgName.delete(17,22);
+                  tempPoint.setLocation(tempPoint.getX()+30,tempPoint.getY());   
+                  points[i-1]= new Point(tempPoint);
+               }
+            }
+            else
+            {
+               msgTxt.setText("Location selected too close to edge");
+               return(false);
+            }     
+         }
+         else
+         {
+            if(tempPoint.getY()<(330-((size-1)*30)))
+            {
+               imgName.append("ver_");
+               
+               for(i=1;i<=size;i++)
+               {
+                  JLabel temp= (JLabel)theGrid.findComponentAt(tempPoint);
+                  imgName.append(i + ".png");
+                  temp.setIcon(new ImageIcon(imgName.toString()));
+                  imgName.delete(17,22);
+                  tempPoint.setLocation(tempPoint.getX(),tempPoint.getY()+30);   
+               }
+            }
+            else
+            {
+               msgTxt.setText("Location selected too close to edge");
+               return(false);
+            }
+         }   
+         
+         ships[shipsAdded]= new Ship(shipSelected,size,shipOrientation,points);
+         shipsAdded++;
+         return(true);
       }
    }
    
