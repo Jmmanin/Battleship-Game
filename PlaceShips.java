@@ -41,6 +41,24 @@ public class PlaceShips
       theFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       theFrame.setResizable(false);
       theFrame.getContentPane().setLayout(new BoxLayout(theFrame.getContentPane(), BoxLayout.Y_AXIS));
+
+      msgPanel= new JPanel();
+      msgPanel.setLayout(new GridLayout(1,3));
+      
+      msgTxt= new JLabel("Select a ship to place.");
+      
+      done= new JButton("Done");
+      done.addActionListener(new DoneButtonHandler());
+      done.setEnabled(false);
+            
+      orientTxt= new JLabel("Orientation: Horizontal");
+      orientTxt.setHorizontalAlignment(SwingConstants.RIGHT);
+      
+      msgPanel.add(msgTxt);
+      msgPanel.add(done);
+      msgPanel.add(orientTxt);
+      
+      theFrame.add(msgPanel);
       
       gridPanel= new JPanel();
       gridPanel.setLayout(new BoxLayout(gridPanel,BoxLayout.X_AXIS));
@@ -71,7 +89,7 @@ public class PlaceShips
    
       shipOrientation= 0;
       orientation= new JButton("Change Orientation");
-      orientation.addActionListener(new ButtonHandler());
+      orientation.addActionListener(new OrientationButtonHandler());
       
       shipPanel.add(battleship);
       shipPanel.add(carrier);
@@ -83,23 +101,6 @@ public class PlaceShips
       shipPanel.addMouseListener(new ShipMouser());
       
       theFrame.add(shipPanel);
-      
-      msgPanel= new JPanel();
-      msgPanel.setLayout(new GridLayout(1,3));
-      
-      msgTxt= new JLabel("Select a ship to place.");
-      
-      done= new JButton("Done");
-      done.setEnabled(false);
-            
-      orientTxt= new JLabel("Orientation: Horizontal");
-      orientTxt.setHorizontalAlignment(SwingConstants.RIGHT);
-      
-      msgPanel.add(msgTxt);
-      msgPanel.add(done);
-      msgPanel.add(orientTxt);
-      
-      theFrame.add(msgPanel);
       
       theFrame.pack();
       theFrame.setVisible(true);
@@ -124,6 +125,8 @@ public class PlaceShips
          StringBuilder imgName= new StringBuilder();
          int i;
                   
+         System.out.println(clicked);         
+         
          imgName.append("resources/" + shipSelected + "_");
                            
          if(clicked.getX()>=topLeftCorner.getX() && clicked.getY()>=topLeftCorner.getY())
@@ -226,7 +229,7 @@ public class PlaceShips
          int xPos= e.getX();
          int yPos= e.getY();
          String labelTxt;
-                  
+
          if(shipPanel.findComponentAt(xPos,yPos)==battleship)
          {
             msgTxt.setText("Battleship selected");
@@ -255,7 +258,7 @@ public class PlaceShips
       }
    }
    
-   private class ButtonHandler implements ActionListener
+   private class OrientationButtonHandler implements ActionListener
    {
       public void actionPerformed(ActionEvent e)
       {
@@ -271,6 +274,15 @@ public class PlaceShips
          }     
       }
    }
+   
+   private class DoneButtonHandler implements ActionListener
+   {
+      public void actionPerformed(ActionEvent e)
+      {
+         new BattleShipUI(ships);
+         //theFrame.setVisible(false);
+      }
+   }   
    
    public static void main(String args[])
    {

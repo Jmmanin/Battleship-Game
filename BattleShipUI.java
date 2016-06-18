@@ -20,7 +20,7 @@ public class BattleShipUI
    private JLabel statusTurnNum;
    private JLabel statusTime;
    
-   public BattleShipUI()
+   public BattleShipUI(Ship[] yourShips)
    {
       gameUI= new JFrame("Battleship Game");
       gameUI.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -31,6 +31,7 @@ public class BattleShipUI
       enemyGrid.addMouseListener(new MouseHandler());
       
       yourGrid= new BSGrid(10);
+      yourGrid.addMouseListener(new MouseHandler());
       
       enemyLabel= new JLabel("Enemy Grid");
       enemyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -58,8 +59,50 @@ public class BattleShipUI
       gameUI.add(statusPanel);
       
       gameUI.pack();
-      gameUI.setVisible(true);      
+      gameUI.setVisible(true);
+      
+      placeYourShips(yourShips);      
    }   
+   
+   private void placeYourShips(Ship[] yourShips)
+   {
+      StringBuilder imgName= new StringBuilder("resources/");
+      int i,j;
+      
+      for(i=0;i<yourShips.length;i++)
+      {
+         System.out.println(yourShips[i].toString());
+         
+         imgName.append(yourShips[i].getName() + "_");
+         
+         if(yourShips[i].getOrientation()==0)
+         {
+            imgName.append("hor_");
+               
+            for(j=1;j<=yourShips[i].getSize();j++)
+            {
+               JLabel temp= (JLabel)yourGrid.findComponentAt(yourShips[i].getLocation(j-1));
+               imgName.append(j + ".png");
+               temp.setIcon(new ImageIcon(imgName.toString()));
+               imgName.delete(17,22);
+            }
+         }
+         else
+         {
+            imgName.append("ver_");
+               
+            for(j=1;j<=yourShips[i].getSize();j++)
+            {
+               JLabel temp= (JLabel)yourGrid.findComponentAt(yourShips[i].getLocation(j-1));
+               imgName.append(j + ".png");
+               temp.setIcon(new ImageIcon(imgName.toString()));
+               imgName.delete(17,22);
+            }
+         }   
+      
+         imgName= new StringBuilder("resources/");
+      }
+   }
    
    private class MouseHandler extends MouseAdapter
    {
@@ -82,10 +125,5 @@ public class BattleShipUI
          if((xPos>=240 && xPos<270) && (yPos>=240 && yPos<270))
             System.out.println("Clicked I9\n");
       }
-   }
-        
-   public static void main(String[] args)
-   {
-      new BattleShipUI();
    }
 }
