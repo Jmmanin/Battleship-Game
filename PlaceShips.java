@@ -258,19 +258,15 @@ public class PlaceShips
          JLabel temp;
          Point[] points= new Point[size];
          int i;
-         
+      
          if(orientation==0)
          {
             if(tempPoint.getX()<(330-((size-1)*30)))
-            {
+            {               
                imgName.append("hor_");
                
                for(i=1;i<=size;i++)
                {
-                  temp= (JLabel)theGrid.findComponentAt(tempPoint);
-                  imgName.append(i + ".png");
-                  temp.setIcon(new ImageIcon(imgName.toString()));
-                  imgName.delete(17,22);
                   points[i-1]= new Point(tempPoint);
                   tempPoint.setLocation(tempPoint.getX()+30,tempPoint.getY());   
                }
@@ -289,10 +285,6 @@ public class PlaceShips
                
                for(i=1;i<=size;i++)
                {
-                  temp= (JLabel)theGrid.findComponentAt(tempPoint);
-                  imgName.append(i + ".png");
-                  temp.setIcon(new ImageIcon(imgName.toString()));
-                  imgName.delete(17,22);
                   points[i-1]= new Point(tempPoint);
                   tempPoint.setLocation(tempPoint.getX(),tempPoint.getY()+30);   
                }
@@ -302,9 +294,27 @@ public class PlaceShips
                msgLabel.setText("Too close to edge");
                return(false);
             }
-         }   
+         }
          
          ships[shipsAdded]= new Ship(shipSelected,size,shipOrientation,points);
+      
+         if(shipsAdded>0)
+         {
+            for(i=0;i<shipsAdded;i++)
+            {
+               if(ships[shipsAdded].getSpaceOccupied().intersects(ships[i].getSpaceOccupied()))
+                  return(false);
+            }
+         }
+                
+         for(i=1;i<=ships[shipsAdded].getSize();i++)
+         {
+            temp= (JLabel)theGrid.findComponentAt(ships[shipsAdded].getLocation(i-1));
+            imgName.append(i + ".png");
+            temp.setIcon(new ImageIcon(imgName.toString()));
+            imgName.delete(17,22);
+         }
+         
          shipsAdded++;
          return(true);
       }

@@ -64,6 +64,11 @@ public class Ship
       return(locations[i]);
    }
    
+   public Rectangle getSpaceOccupied()
+   {
+      return(spaceOccupied);
+   }
+   
    public boolean contains(Point p)
    {
       return(spaceOccupied.contains(p));
