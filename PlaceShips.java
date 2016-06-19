@@ -15,16 +15,20 @@ public class PlaceShips
    private BSGrid theGrid;
    private JPanel shipPanel;
    private JPanel msgPanel;
+   private JPanel buttonPanel;
+   private JButton modeButton;
+   private JButton doneButton;
    private JLabel battleship;
    private JLabel carrier;
    private JLabel cruiser;
    private JLabel destroyer;
    private JLabel submarine;
    private JButton orientation;
-   private JLabel msgTxt;
-   private JButton done;
-   private JLabel orientTxt;
+   private JLabel msgLabel;
+   private JLabel modeLabel;
+   private JLabel orientLabel;
    
+   private int mode;
    private int shipOrientation;
    private String shipSelected;
    private boolean baPlaced;
@@ -41,25 +45,41 @@ public class PlaceShips
       theFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       theFrame.setResizable(false);
       theFrame.getContentPane().setLayout(new BoxLayout(theFrame.getContentPane(), BoxLayout.Y_AXIS));
-
-      msgPanel= new JPanel();
-      msgPanel.setLayout(new GridLayout(1,3));
+   
+      msgPanel= new JPanel(new GridLayout(1,3));
       
-      msgTxt= new JLabel("Select a ship to place.");
+      msgLabel= new JLabel("Select a ship to place.");
       
-      done= new JButton("Done");
-      done.addActionListener(new DoneButtonHandler());
-      done.setEnabled(false);
+      modeLabel= new JLabel("Mode: Place");
+      modeLabel.setHorizontalAlignment(SwingConstants.CENTER);
             
-      orientTxt= new JLabel("Orientation: Horizontal");
-      orientTxt.setHorizontalAlignment(SwingConstants.RIGHT);
+      orientLabel= new JLabel("Orientation: Horizontal");
+      orientLabel.setHorizontalAlignment(SwingConstants.RIGHT);
       
-      msgPanel.add(msgTxt);
-      msgPanel.add(done);
-      msgPanel.add(orientTxt);
+      msgPanel.add(msgLabel);
+      msgPanel.add(modeLabel);
+      msgPanel.add(orientLabel);
       
       theFrame.add(msgPanel);
       
+      buttonPanel= new JPanel(new GridLayout(1,5));
+            
+      doneButton= new JButton("Done");
+      doneButton.addActionListener(new DoneButtonHandler());
+      doneButton.setEnabled(false);
+      
+      mode= 0;      
+      modeButton= new JButton("Mode");
+      modeButton.addActionListener(new ModeButtonHandler());
+      
+      buttonPanel.add(new JLabel());
+      buttonPanel.add(modeButton);
+      buttonPanel.add(new JLabel());
+      buttonPanel.add(doneButton);
+      buttonPanel.add(new JLabel());
+      
+      theFrame.add(buttonPanel);
+            
       gridPanel= new JPanel();
       gridPanel.setLayout(new BoxLayout(gridPanel,BoxLayout.X_AXIS));
       
@@ -119,56 +139,123 @@ public class PlaceShips
    private class GridMouser extends MouseAdapter
    {
       public void mouseClicked(MouseEvent e)
-      {
+      {         
          Point clicked= new Point(e.getX(),e.getY());
          Point topLeftCorner= new Point(30,30);
          StringBuilder imgName= new StringBuilder();
+         Ship toErase;
          int i;
-                  
-         System.out.println(clicked);         
          
-         imgName.append("resources/" + shipSelected + "_");
+         if(mode==0)
+         {         
+            imgName.append("resources/" + shipSelected + "_");
                            
-         if(clicked.getX()>=topLeftCorner.getX() && clicked.getY()>=topLeftCorner.getY())
-         {
-            if(shipSelected=="ba" && baPlaced==false)
+            if(clicked.getX()>=topLeftCorner.getX() && clicked.getY()>=topLeftCorner.getY())
             {
-               baPlaced= placeShip(imgName, clicked, shipOrientation, 4);
-               if(baPlaced==true)
-                  msgTxt.setText("Battleship placed");
+               if(shipSelected=="ba" && baPlaced==false)
+               {
+                  baPlaced= placeShip(imgName, clicked, shipOrientation, 4);
+                  if(baPlaced==true)
+                  {
+                     msgLabel.setText("Battleship placed");
+                     battleship.setEnabled(false);
+                  }   
+               }
+               else if(shipSelected=="ca" && caPlaced==false)
+               {
+                  caPlaced= placeShip(imgName, clicked, shipOrientation, 5);
+                  if(caPlaced==true)
+                  {
+                     msgLabel.setText("Aircraft Carrier placed");
+                     carrier.setEnabled(false);
+                  }   
+               }
+               else if(shipSelected=="cr" && crPlaced==false)
+               {
+                  crPlaced= placeShip(imgName, clicked, shipOrientation, 3);
+                  if(crPlaced==true)
+                  {
+                     msgLabel.setText("Cruiser placed");
+                     cruiser.setEnabled(false);
+                  }   
+               }
+               else if(shipSelected=="de" && dePlaced==false)
+               {
+                  dePlaced= placeShip(imgName, clicked, shipOrientation, 2);
+                  if(dePlaced==true)
+                  {
+                     msgLabel.setText("Destroyer placed");
+                     destroyer.setEnabled(false);
+                  }   
+               }
+               else if(shipSelected=="su" && suPlaced==false)            
+               {
+                  suPlaced= placeShip(imgName, clicked, shipOrientation, 3);
+                  if(suPlaced==true)
+                  {
+                     msgLabel.setText("Submarine placed");
+                     submarine.setEnabled(false);
+                  }   
+               }            
             }
-            else if(shipSelected=="ca" && caPlaced==false)
-            {
-               caPlaced= placeShip(imgName, clicked, shipOrientation, 5);
-               if(baPlaced==true)
-                  msgTxt.setText("Aircraft Carrier placed");
-            }
-            else if(shipSelected=="cr" && crPlaced==false)
-            {
-               crPlaced= placeShip(imgName, clicked, shipOrientation, 3);
-               if(baPlaced==true)
-                  msgTxt.setText("Cruiser placed");
-            }
-            else if(shipSelected=="de" && dePlaced==false)
-            {
-               dePlaced= placeShip(imgName, clicked, shipOrientation, 2);
-               if(baPlaced==true)
-                  msgTxt.setText("Destroyer placed");
-            }
-            else if(shipSelected=="su" && suPlaced==false)            
-            {
-               suPlaced= placeShip(imgName, clicked, shipOrientation, 3);
-               if(baPlaced==true)
-                  msgTxt.setText("Submarine placed");
-            }
-         }
          
-         if(shipsAdded==5)
-            done.setEnabled(true);
+            if(shipsAdded==5)
+               doneButton.setEnabled(true);
+         }
+         else
+         {
+            for(i=0;i<shipsAdded;i++)
+            {
+               if(shipsAdded>0 && ships[i].contains(clicked))
+               {
+                  toErase= ships[i];
+                  eraseShip(toErase);
+                  
+                  if(ships[i].getName()=="ba")
+                  {
+                     battleship.setEnabled(true);
+                     baPlaced= false;
+                     msgLabel.setText("Battleship Removed");
+                  }
+                  else if(ships[i].getName()=="ca")
+                  {
+                     carrier.setEnabled(true);
+                     caPlaced= false;
+                     msgLabel.setText("Aircraft Carrier Removed");
+                  }
+                  else if(ships[i].getName()=="cr")
+                  {
+                     cruiser.setEnabled(true);
+                     crPlaced= false;
+                     msgLabel.setText("Cruiser Removed");
+                  }
+                  else if(ships[i].getName()=="de")
+                  {
+                     destroyer.setEnabled(true);
+                     dePlaced= false;
+                     msgLabel.setText("Destroyer Removed");
+                  }
+                  else
+                  {
+                     submarine.setEnabled(true);
+                     suPlaced= false;
+                     msgLabel.setText("Submarine Removed");
+                  }
+                                    
+                  ships[i]= ships[shipsAdded-1];
+                  ships[shipsAdded-1]= null;
+                  shipsAdded--;
+                  doneButton.setEnabled(false);
+               
+                  break;
+               }   
+            }
+         }   
       }
       
-      public boolean placeShip(StringBuilder imgName, Point tempPoint, int orientation, int size)
+      private boolean placeShip(StringBuilder imgName, Point tempPoint, int orientation, int size)
       {
+         JLabel temp;
          Point[] points= new Point[size];
          int i;
          
@@ -180,7 +267,7 @@ public class PlaceShips
                
                for(i=1;i<=size;i++)
                {
-                  JLabel temp= (JLabel)theGrid.findComponentAt(tempPoint);
+                  temp= (JLabel)theGrid.findComponentAt(tempPoint);
                   imgName.append(i + ".png");
                   temp.setIcon(new ImageIcon(imgName.toString()));
                   imgName.delete(17,22);
@@ -190,7 +277,7 @@ public class PlaceShips
             }
             else
             {
-               msgTxt.setText("Location selected too close to edge");
+               msgLabel.setText("Too close to edge");
                return(false);
             }     
          }
@@ -202,7 +289,7 @@ public class PlaceShips
                
                for(i=1;i<=size;i++)
                {
-                  JLabel temp= (JLabel)theGrid.findComponentAt(tempPoint);
+                  temp= (JLabel)theGrid.findComponentAt(tempPoint);
                   imgName.append(i + ".png");
                   temp.setIcon(new ImageIcon(imgName.toString()));
                   imgName.delete(17,22);
@@ -212,7 +299,7 @@ public class PlaceShips
             }
             else
             {
-               msgTxt.setText("Location selected too close to edge");
+               msgLabel.setText("Too close to edge");
                return(false);
             }
          }   
@@ -221,40 +308,55 @@ public class PlaceShips
          shipsAdded++;
          return(true);
       }
+      
+      private void eraseShip(Ship toErase)
+      {
+         JLabel temp;
+         int i;
+         
+         for(i=0;i<toErase.getSize();i++)
+         {
+            temp= (JLabel)theGrid.findComponentAt(toErase.getLocation(i));
+            temp.setIcon(new ImageIcon("resources/ocean.png"));
+         }         
+      } 
    }
    
    private class ShipMouser extends MouseAdapter
    {
       public void mouseClicked(MouseEvent e)
       {
-         int xPos= e.getX();
-         int yPos= e.getY();
-         String labelTxt;
-
-         if(shipPanel.findComponentAt(xPos,yPos)==battleship)
+         if(mode==0)
          {
-            msgTxt.setText("Battleship selected");
-            shipSelected= "ba";
-         }
-         if(shipPanel.findComponentAt(xPos,yPos)==carrier)
-         {
-            msgTxt.setText("Aircraft Carrier selected");
-            shipSelected= "ca";
-         }
-         if(shipPanel.findComponentAt(xPos,yPos)==cruiser)
-         {
-            msgTxt.setText("Cruiser selected");
-            shipSelected= "cr";
-         }
-         if(shipPanel.findComponentAt(xPos,yPos)==destroyer)
-         {
-            msgTxt.setText("Destroyer selected");
-            shipSelected= "de";
-         }
-         if(shipPanel.findComponentAt(xPos,yPos)==submarine)
-         {
-            msgTxt.setText("Submarine selected");
-            shipSelected= "su";
+            int xPos= e.getX();
+            int yPos= e.getY();
+            String labelLabel;
+         
+            if(shipPanel.findComponentAt(xPos,yPos)==battleship)
+            {
+               msgLabel.setText("Battleship selected");
+               shipSelected= "ba";
+            }
+            if(shipPanel.findComponentAt(xPos,yPos)==carrier)
+            {
+               msgLabel.setText("Aircraft Carrier selected");
+               shipSelected= "ca";
+            }
+            if(shipPanel.findComponentAt(xPos,yPos)==cruiser)
+            {
+               msgLabel.setText("Cruiser selected");
+               shipSelected= "cr";
+            }
+            if(shipPanel.findComponentAt(xPos,yPos)==destroyer)
+            {
+               msgLabel.setText("Destroyer selected");
+               shipSelected= "de";
+            }
+            if(shipPanel.findComponentAt(xPos,yPos)==submarine)
+            {
+               msgLabel.setText("Submarine selected");
+               shipSelected= "su";
+            }
          }
       }
    }
@@ -265,17 +367,34 @@ public class PlaceShips
       {
          if(shipOrientation==0)
          {
-            orientTxt.setText("Orientation: Veritcal");
+            orientLabel.setText("Orientation: Veritcal");
             shipOrientation= 1;
          }   
          else
          {
-            orientTxt.setText("Orientation: Horizontal");
+            orientLabel.setText("Orientation: Horizontal");
             shipOrientation= 0;
          }     
       }
    }
    
+   private class ModeButtonHandler implements ActionListener
+   {
+      public void actionPerformed(ActionEvent e)
+      {
+         if(mode==0)
+         {
+            mode= 1;
+            modeLabel.setText("Mode: Erase");
+         }
+         else
+         {
+            mode= 0;
+            modeLabel.setText("Mode: Place");
+         }
+      }
+   } 
+      
    private class DoneButtonHandler implements ActionListener
    {
       public void actionPerformed(ActionEvent e)

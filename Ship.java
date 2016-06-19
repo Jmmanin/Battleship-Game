@@ -12,13 +12,36 @@ public class Ship
    private int orientation;
    private Point[] locations;
    private int size;
+   private Rectangle spaceOccupied;
    
    public Ship(String n,int s,int o,Point[] p)
    {
       name= n;
       size= s;
       orientation= o;
-      locations= p;           
+      locations= p;
+      
+      spaceOccupied= makeRectangle();      
+   }
+   
+   private Rectangle makeRectangle()
+   {
+      int x,y;
+      
+      x= (int)locations[0].getX();
+      y= (int)locations[0].getY();
+      
+      x= (x/30)*30;
+      y= (y/30)*30;
+            
+      if(orientation==0)
+      {
+         return(new Rectangle(x,y,size*30,30));
+      }
+      else
+      {
+         return(new Rectangle(x,y,30,size*30));
+      }
    }
    
    public String getName()
@@ -39,6 +62,11 @@ public class Ship
    public Point getLocation(int i)
    {
       return(locations[i]);
+   }
+   
+   public boolean contains(Point p)
+   {
+      return(spaceOccupied.contains(p));
    }
    
    public String toString()
