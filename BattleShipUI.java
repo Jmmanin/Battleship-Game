@@ -7,6 +7,9 @@ Jeremy Manin and John Dott
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 
 public class BattleShipUI
 {
@@ -18,7 +21,7 @@ public class BattleShipUI
    private JPanel statusPanel;
    private JLabel statusTurn;
    private JLabel statusTurnNum;
-   private JLabel statusTime;
+   private JLabel statusTime;   
    
    public BattleShipUI(Ship[] yourShips)
    {
@@ -61,7 +64,9 @@ public class BattleShipUI
       gameUI.pack();
       gameUI.setVisible(true);
       
-      placeYourShips(yourShips);      
+      placeYourShips(yourShips);
+      
+      JOptionPane.showMessageDialog(null, "Enemy fleet located!\nBattle stations! Battle stations!\nThis is not a drill!", "Attention Admiral!", JOptionPane.INFORMATION_MESSAGE, new ImageIcon("resources/alarm.png"));
    }   
    
    private void placeYourShips(Ship[] yourShips)
@@ -71,7 +76,7 @@ public class BattleShipUI
       
       for(i=0;i<yourShips.length;i++)
       {
-         System.out.println(yourShips[i].toString());
+         //System.out.println(yourShips[i].toString());
          
          imgName.append(yourShips[i].getName() + "_");
          
@@ -85,7 +90,7 @@ public class BattleShipUI
                imgName.append(j + ".png");
                temp.setIcon(new ImageIcon(imgName.toString()));
                imgName.delete(17,22);
-            }
+            }            
          }
          else
          {
@@ -110,20 +115,45 @@ public class BattleShipUI
       {
          int xPos= e.getX();
          int yPos= e.getY();
+         Point clicked;
+         char yGrid= 64;
+         int xGrid;
+         StringBuilder gridLoc= new StringBuilder();
+         Attack userAttack;
          
-         System.out.println("X Position: " + xPos + "\nY Position: " + yPos);
+         if(xPos>=30 && yPos>=30)
+         { 
+            clicked= new Point(xPos, yPos);
+            yGrid= (char)(yGrid + (yPos/30));
+            xGrid= xPos/30;
+            gridLoc.append(yGrid + Integer.toString(xGrid));
          
-         xPos= xPos-30;
-         yPos= yPos-30;
-         
-         if((xPos>=0 && xPos<30) && (yPos>=0 && yPos<30))
-            System.out.println("Clicked A1\n");
+            userAttack= new Attack(clicked, gridLoc.toString());
             
-         if((xPos>=240 && xPos<270) && (yPos>=0 && yPos<30))
-            System.out.println("Clicked A9\n");
-      
-         if((xPos>=240 && xPos<270) && (yPos>=240 && yPos<270))
-            System.out.println("Clicked I9\n");
+            /*try //places cross over icon
+            {
+               JLabel temp= (JLabel)yourGrid.findComponentAt(clicked);
+               ImageIcon temp2= (ImageIcon)temp.getIcon();
+               BufferedImage a= ImageIO.read(new File(temp2.getDescription()));
+               BufferedImage b= ImageIO.read(new File("resources/cross.png"));
+               BufferedImage combined= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
+               Graphics g= combined.getGraphics();
+            
+               g.drawImage(a,0,0,null);
+               g.drawImage(b,0,0,null);
+            
+               temp.setIcon(new ImageIcon(combined));
+               temp.setEnabled(false);
+            }
+            catch(IOException e2)
+            {
+               System.out.println(e2.getMessage());   
+            }*/
+            
+            System.out.println(clicked);
+            System.out.println(gridLoc);
+            System.out.println(userAttack);
+         }
       }
    }
 }

@@ -7,6 +7,9 @@ Jeremy Manin and John Dott
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 
 public class PlaceShips
 {
@@ -28,6 +31,7 @@ public class PlaceShips
    private JLabel modeLabel;
    private JLabel orientLabel;
    
+   private File imgPath;
    private int mode;
    private int shipOrientation;
    private String shipSelected;
@@ -67,6 +71,8 @@ public class PlaceShips
       doneButton= new JButton("Done");
       doneButton.addActionListener(new DoneButtonHandler());
       doneButton.setEnabled(false);
+      
+      imgPath= new File("resources");
       
       mode= 0;      
       modeButton= new JButton("Mode");
