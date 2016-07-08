@@ -11,7 +11,7 @@ import java.io.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 
-public class BattleShipUI
+public class BattleshipUI
 {
    private JFrame gameUI;
    private BSGrid enemyGrid;
@@ -23,7 +23,7 @@ public class BattleShipUI
    private JLabel statusTurnNum;
    private JLabel statusTime;   
    
-   public BattleShipUI(Ship[] yourShips)
+   public BattleshipUI(Ship[] yourShips, String hN, int pN1, int pN2)
    {
       gameUI= new JFrame("Battleship Game");
       gameUI.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -62,11 +62,12 @@ public class BattleShipUI
       gameUI.add(statusPanel);
       
       gameUI.pack();
+      gameUI.setLocationRelativeTo(null);
       gameUI.setVisible(true);
       
       placeYourShips(yourShips);
-      
-      JOptionPane.showMessageDialog(null, "Enemy fleet located!\nBattle stations! Battle stations!\nThis is not a drill!", "Attention Admiral!", JOptionPane.INFORMATION_MESSAGE, new ImageIcon("resources/alarm.png"));
+            
+      JOptionPane.showMessageDialog(gameUI, "Enemy fleet located!\nBattle stations! Battle stations!\nThis is not a drill!", "Attention Admiral!", JOptionPane.INFORMATION_MESSAGE, new ImageIcon("resources/alarm.png"));
    }   
    
    private void placeYourShips(Ship[] yourShips)
@@ -156,4 +157,9 @@ public class BattleShipUI
          }
       }
    }
+   
+   /*public static void main(String args[])
+   {
+      new BattleshipUI(null);
+   }*/
 }

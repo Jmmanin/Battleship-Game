@@ -31,7 +31,6 @@ public class PlaceShips
    private JLabel modeLabel;
    private JLabel orientLabel;
    
-   private File imgPath;
    private int mode;
    private int shipOrientation;
    private String shipSelected;
@@ -43,7 +42,10 @@ public class PlaceShips
    private int shipsAdded;
    private Ship[] ships;
    
-   public PlaceShips()
+   private String hostName;
+   private int portNumber1, portNumber2;
+   
+   public PlaceShips(BSClientThread theThread)
    {
       theFrame= new JFrame("Ship Placement");
       theFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -69,14 +71,12 @@ public class PlaceShips
       buttonPanel= new JPanel(new GridLayout(1,5));
             
       doneButton= new JButton("Done");
-      doneButton.addActionListener(new DoneButtonHandler());
+      doneButton.addActionListener(new DoneButtonListener());
       doneButton.setEnabled(false);
-      
-      imgPath= new File("resources");
-      
+            
       mode= 0;      
       modeButton= new JButton("Mode");
-      modeButton.addActionListener(new ModeButtonHandler());
+      modeButton.addActionListener(new ModeButtonListener());
       
       buttonPanel.add(new JLabel());
       buttonPanel.add(modeButton);
@@ -115,7 +115,7 @@ public class PlaceShips
    
       shipOrientation= 0;
       orientation= new JButton("Change Orientation");
-      orientation.addActionListener(new OrientationButtonHandler());
+      orientation.addActionListener(new OrientationButtonListener());
       
       shipPanel.add(battleship);
       shipPanel.add(carrier);
@@ -129,6 +129,7 @@ public class PlaceShips
       theFrame.add(shipPanel);
       
       theFrame.pack();
+      theFrame.setLocationRelativeTo(null);
       theFrame.setVisible(true);
       
       shipSelected= null;
@@ -377,7 +378,7 @@ public class PlaceShips
       }
    }
    
-   private class OrientationButtonHandler implements ActionListener
+   private class OrientationButtonListener implements ActionListener
    {
       public void actionPerformed(ActionEvent e)
       {
@@ -394,7 +395,7 @@ public class PlaceShips
       }
    }
    
-   private class ModeButtonHandler implements ActionListener
+   private class ModeButtonListener implements ActionListener
    {
       public void actionPerformed(ActionEvent e)
       {
@@ -411,17 +412,18 @@ public class PlaceShips
       }
    } 
       
-   private class DoneButtonHandler implements ActionListener
+   private class DoneButtonListener implements ActionListener
    {
       public void actionPerformed(ActionEvent e)
       {
-         new BattleShipUI(ships);
-         //theFrame.setVisible(false);
+         theFrame.setVisible(false);
+         theFrame.dispose();
+         new BattleshipUI(ships, hostName, portNumber1, portNumber2);
       }
    }   
    
-   public static void main(String args[])
+   /*public static void main(String args[])
    {
-      new PlaceShips();
-   }
+      new PlaceShips(null,0,0);
+   }*/
 }
