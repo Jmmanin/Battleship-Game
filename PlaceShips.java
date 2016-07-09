@@ -42,10 +42,9 @@ public class PlaceShips
    private int shipsAdded;
    private Ship[] ships;
    
-   private String hostName;
-   private int portNumber1, portNumber2;
+   private BSClientThread clientThread;
    
-   public PlaceShips(BSClientThread theThread)
+   public PlaceShips(BSClientThread cT)
    {
       theFrame= new JFrame("Ship Placement");
       theFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -141,6 +140,8 @@ public class PlaceShips
       
       shipsAdded= 0;
       ships= new Ship[5];
+      
+      clientThread= cT;
    }
    
    private class GridMouser extends MouseAdapter
@@ -415,10 +416,10 @@ public class PlaceShips
    private class DoneButtonListener implements ActionListener
    {
       public void actionPerformed(ActionEvent e)
-      {
+      {               
          theFrame.setVisible(false);
-         theFrame.dispose();
-         new BattleshipUI(ships, hostName, portNumber1, portNumber2);
+         theFrame.dispose();                  
+         new BattleshipUI(ships, clientThread);
       }
    }   
    

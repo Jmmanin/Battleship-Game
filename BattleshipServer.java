@@ -31,11 +31,6 @@ public class BattleshipServer
    private JButton startButton;
    private JButton stopButton;
    private JTextArea console;
-   
-   private ServerSocket serverSocket1, serverSocket2;
-   private Socket p1Socket, p2Socket;
-   private ObjectOutputStream p1Out, p2Out;
-   private ObjectInputStream p1In, p2In;
          
    public BattleshipServer()
    {
@@ -139,7 +134,7 @@ public class BattleshipServer
    }
    
    private class StartButtonListener implements ActionListener
-   {
+   {         
       public void actionPerformed(ActionEvent e)
       {
          console.append("\nServer starting with ports " + port1Field.getText() + " and " + port2Field.getText() + ".\n");
@@ -163,15 +158,23 @@ public class BattleshipServer
    
    private class ServerThread extends Thread
    {
+      private ServerSocket serverSocket1, serverSocket2;
+      private Socket p1Socket, p2Socket;
+      private ObjectOutputStream p1Out, p2Out;
+      private ObjectInputStream p1In, p2In;
+      private boolean isP1Turn;
+      
       public void run()
       {
          try
          {            
+            isP1Turn= true;
+            
             serverSocket1= new ServerSocket(Integer.parseInt(port1Field.getText()));
             serverSocket2= new ServerSocket(Integer.parseInt(port2Field.getText()));
          
             p1Socket= serverSocket1.accept();
-            console.append("Player 1 has connected: " + p1Socket.getInetAddress().toString() + "\n");
+            console.append("\nPlayer 1 has connected: " + p1Socket.getInetAddress().toString() + "\n");
             p2Socket= serverSocket1.accept();
                   
             p1Out= new ObjectOutputStream(p1Socket.getOutputStream());
@@ -185,7 +188,7 @@ public class BattleshipServer
             p1Out.flush();      
             p2Out.writeBoolean(false);
             p2Out.flush();      
-
+         
             p2Socket.close();
             p2Socket= serverSocket2.accept();
             console.append("Player 2 has connected: " + p2Socket.getInetAddress().toString() + "\n");
@@ -194,16 +197,26 @@ public class BattleshipServer
             p2Out.flush();
             p2In= new ObjectInputStream(p2Socket.getInputStream());
             
-            console.append("Both players have connected\n");
+            console.append("Both players have connected\n\nEntering main game.\n");
+                        
+            /*while(true)
+            {
+               if(isP1Turn)
+               {
+                  Object fromUser= p1In.readObject();
+                  
+                  
+               }      
+            }*/
          }
          catch(IOException e)
          {
             console.append("\nError: " + e.getMessage());
          }
-         catch(NullPointerException e)
+         /*catch(ClassNotFoundException e)
          {
             console.append("\nError: " + e.getMessage());
-         }
+         }*/
       }
    }
        

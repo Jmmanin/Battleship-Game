@@ -21,10 +21,16 @@ public class BattleshipUI
    private JPanel statusPanel;
    private JLabel statusTurn;
    private JLabel statusTurnNum;
-   private JLabel statusTime;   
+   private JLabel statusTime;
+   private boolean isTurn;
    
-   public BattleshipUI(Ship[] yourShips, String hN, int pN1, int pN2)
+   private BSClientThread clientThread;  
+   
+   public BattleshipUI(Ship[] yourShips, BSClientThread cT)
    {
+      clientThread= cT;
+      isTurn= clientThread.getTurn();
+      
       gameUI= new JFrame("Battleship Game");
       gameUI.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       gameUI.setResizable(false);
@@ -44,8 +50,11 @@ public class BattleshipUI
       statusPanel= new JPanel();
       statusPanel.setLayout(new GridLayout(1,3));
       
-      statusTurn= new JLabel("Your Turn");
-      //statusTurn.setFont(
+      if(isTurn)
+         statusTurn= new JLabel("Your Turn");
+      else
+         statusTurn= new JLabel("Enemy Turn");
+
       statusTurnNum= new JLabel("0 Turns");
       statusTurnNum.setHorizontalAlignment(SwingConstants.CENTER);
       statusTime= new JLabel("0:00");
@@ -66,7 +75,7 @@ public class BattleshipUI
       gameUI.setVisible(true);
       
       placeYourShips(yourShips);
-            
+                  
       JOptionPane.showMessageDialog(gameUI, "Enemy fleet located!\nBattle stations! Battle stations!\nThis is not a drill!", "Attention Admiral!", JOptionPane.INFORMATION_MESSAGE, new ImageIcon("resources/alarm.png"));
    }   
    
@@ -76,9 +85,7 @@ public class BattleshipUI
       int i,j;
       
       for(i=0;i<yourShips.length;i++)
-      {
-         //System.out.println(yourShips[i].toString());
-         
+      {         
          imgName.append(yourShips[i].getName() + "_");
          
          if(yourShips[i].getOrientation()==0)

@@ -5,13 +5,16 @@ Jeremy Manin and John Dott
 */
 
 import java.awt.*;
+import java.io.Serializable;
 
-public class Attack
+public class Attack implements Serializable
 {
    private Point coords;
    private String coordName;
    private boolean isHit;
    private String shipName;
+   private boolean shipSunk;
+   private boolean endGame;
    
    public Attack(Point c, String cN)
    {
@@ -19,12 +22,16 @@ public class Attack
       coordName= cN;
       isHit= false;
       shipName= null;
+      shipSunk= false;
+      endGame= false;
    }
    
-   public void setIsHit(String sN)
+   public void setIsHit(String sN, boolean sS, boolean eG)
    {
       isHit= true;
       shipName= sN;
+      shipSunk= sS;
+      endGame= eG;
    }
    
    public String toString()

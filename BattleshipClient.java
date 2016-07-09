@@ -94,13 +94,8 @@ public class BattleshipClient
          BSClientThread theThread= new BSClientThread(hostField.getText(), Integer.parseInt(port1Field.getText()), Integer.parseInt(port2Field.getText()));
          theThread.start();
          
-         if(!theThread.isInterrupted())
-         {
-            System.out.println("starting placeships");
-            new PlaceShips(theThread);
-         }
-         
-         System.out.println(theThread.activeCount());
+         theFrame.setVisible(false);
+         theFrame.dispose();
       }
    }
          
