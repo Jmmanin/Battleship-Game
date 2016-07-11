@@ -1,15 +1,12 @@
 /*
 Multiplayer Battleship Game
 PlaceShips
-Jeremy Manin and John Dott
+Jeremy Manin
 */
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.*;
-import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
 
 public class PlaceShips
 {
@@ -142,6 +139,11 @@ public class PlaceShips
       ships= new Ship[5];
       
       clientThread= cT;
+   }
+   
+   public Ship[] getShips()
+   {
+      return(ships);
    }
    
    private class GridMouser extends MouseAdapter
@@ -310,7 +312,7 @@ public class PlaceShips
          {
             for(i=0;i<shipsAdded;i++)
             {
-               if(ships[shipsAdded].getSpaceOccupied().intersects(ships[i].getSpaceOccupied()))
+               if(ships[shipsAdded].getTotalSpaceOccupied().intersects(ships[i].getTotalSpaceOccupied()))
                   return(false);
             }
          }
@@ -418,8 +420,12 @@ public class PlaceShips
       public void actionPerformed(ActionEvent e)
       {               
          theFrame.setVisible(false);
-         theFrame.dispose();                  
-         new BattleshipUI(ships, clientThread);
+         theFrame.dispose();   
+         clientThread.setContToMain(true);
+         synchronized(clientThread)
+         {
+            clientThread.notifyAll();
+         }
       }
    }   
    

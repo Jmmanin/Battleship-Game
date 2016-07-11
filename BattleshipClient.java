@@ -1,7 +1,7 @@
 /*
 Multiplayer Battleship Game
 Battleship Client
-Jeremy Manin and John Dott
+Jeremy Manin
 */
 
 import javax.swing.*;

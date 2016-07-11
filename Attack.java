@@ -1,7 +1,7 @@
 /*
 Multiplayer Battleship Game
 Attack
-Jeremy Manin and John Dott
+Jeremy Manin
 */
 
 import java.awt.*;
@@ -34,12 +34,17 @@ public class Attack implements Serializable
       endGame= eG;
    }
    
+   public String getCoordName()
+   {
+      return(coordName);
+   }
+   
    public String toString()
    {
       StringBuilder output= new StringBuilder("Attack:\n");
       
       output.append(coords.toString());
-      output.append("\n" + coordName + " " + isHit + " " + shipName);
+      output.append("\n" + coordName + " Hit:" + isHit + " Ship:" + shipName + " Sunk:" + shipSunk + " End:" + endGame);
       
       return(output.toString());
    }

@@ -1,7 +1,7 @@
 /*
 Multiplayer Battleship Game
 Battleship Server
-Jeremy Manin and John Dott
+Jeremy Manin
 */
 
 import javax.swing.*;
@@ -31,6 +31,8 @@ public class BattleshipServer
    private JButton startButton;
    private JButton stopButton;
    private JTextArea console;
+   
+   private ServerThread serverThread;
          
    public BattleshipServer()
    {
@@ -139,7 +141,8 @@ public class BattleshipServer
       {
          console.append("\nServer starting with ports " + port1Field.getText() + " and " + port2Field.getText() + ".\n");
          
-         (new ServerThread()).start();
+         serverThread= new ServerThread();
+         serverThread.start();
          
          port1Field.setEnabled(false);
          port2Field.setEnabled(false);
@@ -152,7 +155,8 @@ public class BattleshipServer
    {
       public void actionPerformed(ActionEvent e)
       {
-      
+         serverThread.closeConnection();
+         System.exit(0);
       }
    }
    
@@ -198,25 +202,56 @@ public class BattleshipServer
             p2In= new ObjectInputStream(p2Socket.getInputStream());
             
             console.append("Both players have connected\n\nEntering main game.\n");
-                        
-            /*while(true)
+                                    
+            while(true)
             {
                if(isP1Turn)
                {
-                  Object fromUser= p1In.readObject();
-                  
-                  
+                  Attack fromClient= (Attack)p1In.readObject();
+                  console.append("P1 Attacks " + fromClient.getCoordName() + ".\n");
+                  p2Out.writeObject(fromClient);
+                  p2Out.flush();
+                  fromClient= (Attack)p2In.readObject();
+                  console.append("P2 Confirms " + fromClient.getCoordName() + " hit/miss.\n"); //implement if else for hit/miss
+                  p1Out.writeObject(fromClient);
+                  p1Out.flush();
                }      
-            }*/
+               else
+               {
+                  Attack fromClient= (Attack)p2In.readObject();
+                  console.append("P2 Attacks " + fromClient.getCoordName() + ".\n");
+                  p1Out.writeObject(fromClient);
+                  p1Out.flush();
+                  fromClient= (Attack)p1In.readObject();
+                  console.append("P1 Confirms " + fromClient.getCoordName() + " hit/miss.\n"); //implement if else for hit/miss
+                  p2Out.writeObject(fromClient);
+                  p2Out.flush();
+               }
+               
+               isP1Turn= !isP1Turn;
+            }
          }
          catch(IOException e)
          {
             console.append("\nError: " + e.getMessage());
          }
-         /*catch(ClassNotFoundException e)
+         catch(ClassNotFoundException e)
          {
             console.append("\nError: " + e.getMessage());
-         }*/
+         }
+      }
+      
+      public void closeConnection()
+      {
+         try
+         {
+            p1Socket.close();
+            p2Socket.close();
+            serverSocket1.close();
+            serverSocket2.close();            
+         }
+         catch(IOException e){}
+         catch(NullPointerException e){}        
       }
    }
        

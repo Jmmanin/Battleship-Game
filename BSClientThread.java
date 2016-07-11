@@ -1,7 +1,7 @@
 /*
 Multiplayer Battleship Game
 Client Thread
-Jeremy Manin and John Dott
+Jeremy Manin
 */
 
 import java.io.*;
@@ -17,6 +17,7 @@ public class BSClientThread extends Thread
    private ObjectInputStream in;
    private ObjectOutputStream out;
    private boolean isTurn= true;
+   private boolean contToMain= false;
                      
    public BSClientThread(String hN, int pN1, int pN2)
    {
@@ -61,64 +62,103 @@ public class BSClientThread extends Thread
          waitMsgBox.setVisible(false);
          waitMsgBox.dispose();
                      
-         new PlaceShips(this);
+         PlaceShips placeShips= new PlaceShips(this);
+         
+         synchronized(this)
+         {
+            while(!contToMain)
+               this.wait();
+         }
+         
+         BattleshipUI mainGame= new BattleshipUI(placeShips.getShips(), this);
+         
+         System.out.println("main game started");
+         
+         while(true)
+         {
+            if(isTurn)
+            {
+               Attack received= (Attack)in.readObject();
+               mainGame.proccessAttack(received); 
+            }
+            else
+            {
+               Attack received= (Attack)in.readObject();
+               received= mainGame.proccessAttack(received);
+               sendAttack(received);
+            }
+         
+            out.flush();
+            isTurn= !isTurn;
+            
+            mainGame.updateTurnLabel(isTurn);
+         }
       }
       catch(UnknownHostException e)
       {
          JOptionPane.showMessageDialog(null ,"Could not connect to server.\nCheck hostname and port numbers and try again.", "Connection Error", JOptionPane.ERROR_MESSAGE);          
-      
-         new BattleshipClient();
-         
-         if(waitMsgBox.isDisplayable())
-            waitMsgBox.dispose();
-            
-         interrupt();
+         System.exit(1);
       } 
       catch(IOException e)
       {
          JOptionPane.showMessageDialog(null ,"Error communicating with server.\nCheck hostname and port numbers and try again.", "Communication Error", JOptionPane.ERROR_MESSAGE);          
-      
-         new BattleshipClient();
-         
-         if(waitMsgBox.isDisplayable())
-            waitMsgBox.dispose();
-            
-         interrupt();
+         System.exit(1);
+      }
+      catch(InterruptedException e)
+      {
+         JOptionPane.showMessageDialog(null ,"Client thread was interrupted.", "Thread Interrupted", JOptionPane.ERROR_MESSAGE);          
+         System.exit(1);
+      }
+      catch(ClassNotFoundException e)
+      {
+         JOptionPane.showMessageDialog(null ,"Error reading attack.", "Read Error", JOptionPane.ERROR_MESSAGE);          
+         System.exit(1);
       }
    }
    
-   public boolean getTurn()
+   public boolean getIsTurn()
    {
       return(isTurn);
    }
    
-   public Object sendObject(Object toSend)
+   public void setContToMain(boolean toSet)
    {
-      if(isTurn)
-      {
-         try
-         {
-            isTurn= !isTurn;
-            out.writeObject(toSend);
-            out.flush();
-            return(in.readObject());
-         }
-         catch(IOException e)
-         {
-            JOptionPane.showMessageDialog(null ,"Error communicating with server.\nCheck connection to server and try again.", "Communication Error", JOptionPane.ERROR_MESSAGE);          
-            closeConnection();
-            return(null);
-         }
-         catch(ClassNotFoundException e)
-         {
-            JOptionPane.showMessageDialog(null ,"Error sending attack.\nCheck connection to server and try again.", "Communication Error", JOptionPane.ERROR_MESSAGE);          
-            closeConnection();
-            return(null);
-         }
-      }
-      else
-         return(null);
+      contToMain= toSet;   
    }
+   
+   public void sendAttack(Attack toSend)
+   {
+      try
+      {
+         out.writeObject(toSend);
+         out.flush();
+      }
+      catch(IOException e)
+      {
+         JOptionPane.showMessageDialog(null ,"Error communicating with server.\nCheck connection to server and try again.", "Communication Error", JOptionPane.ERROR_MESSAGE);          
+         closeConnection();
+      }
+   }
+   
+   /*public Attack receiveAttack()
+   {
+      try
+      {
+         return((Attack)in.readObject());
+      }
+      catch(IOException e)
+      {
+         JOptionPane.showMessageDialog(null ,"Error communicating with server.\nCheck connection to server and try again.", "Communication Error", JOptionPane.ERROR_MESSAGE);          
+         closeConnection();
+         return(null);
+      }
+      catch(ClassNotFoundException e)
+      {
+         JOptionPane.showMessageDialog(null ,"Error sending attack.\nCheck connection to server and try again.", "Communication Error", JOptionPane.ERROR_MESSAGE);          
+         closeConnection();
+         return(null);
+      }
+   }*/
    
    public void closeConnection()
    {

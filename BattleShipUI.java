@@ -1,7 +1,7 @@
 /*
 Multiplayer Battleship Game
 Game UI
-Jeremy Manin and John Dott
+Jeremy Manin
 */
 
 import javax.swing.*;
@@ -22,14 +22,14 @@ public class BattleshipUI
    private JLabel statusTurn;
    private JLabel statusTurnNum;
    private JLabel statusTime;
-   private boolean isTurn;
+   
+   private Ship[] yourShips;
    
    private BSClientThread clientThread;  
    
-   public BattleshipUI(Ship[] yourShips, BSClientThread cT)
+   public BattleshipUI(Ship[] yS, BSClientThread cT)
    {
       clientThread= cT;
-      isTurn= clientThread.getTurn();
       
       gameUI= new JFrame("Battleship Game");
       gameUI.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -40,7 +40,6 @@ public class BattleshipUI
       enemyGrid.addMouseListener(new MouseHandler());
       
       yourGrid= new BSGrid(10);
-      yourGrid.addMouseListener(new MouseHandler());
       
       enemyLabel= new JLabel("Enemy Grid");
       enemyLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -50,11 +49,11 @@ public class BattleshipUI
       statusPanel= new JPanel();
       statusPanel.setLayout(new GridLayout(1,3));
       
-      if(isTurn)
+      if(clientThread.getIsTurn())
          statusTurn= new JLabel("Your Turn");
       else
          statusTurn= new JLabel("Enemy Turn");
-
+   
       statusTurnNum= new JLabel("0 Turns");
       statusTurnNum.setHorizontalAlignment(SwingConstants.CENTER);
       statusTime= new JLabel("0:00");
@@ -74,10 +73,33 @@ public class BattleshipUI
       gameUI.setLocationRelativeTo(null);
       gameUI.setVisible(true);
       
+      yourShips= yS;
       placeYourShips(yourShips);
                   
       JOptionPane.showMessageDialog(gameUI, "Enemy fleet located!\nBattle stations! Battle stations!\nThis is not a drill!", "Attention Admiral!", JOptionPane.INFORMATION_MESSAGE, new ImageIcon("resources/alarm.png"));
-   }   
+   } 
+   
+   public Attack proccessAttack(Attack toProcess)
+   {
+      if(clientThread.getIsTurn())
+      {
+         System.out.println("Attack Processed");
+         return(toProcess);            
+      }
+      else
+      {
+         System.out.println("Attack Processed");
+         return(toProcess);
+      }
+   }
+   
+   public void updateTurnLabel(boolean turn)
+   {
+      if(turn)
+         statusTurn.setText("Your Turn");
+      else
+         statusTurn.setText("Enemy Turn");   
+   }     
    
    private void placeYourShips(Ship[] yourShips)
    {
@@ -97,6 +119,21 @@ public class BattleshipUI
                JLabel temp= (JLabel)yourGrid.findComponentAt(yourShips[i].getLocation(j-1));
                imgName.append(j + ".png");
                temp.setIcon(new ImageIcon(imgName.toString()));
+               
+               try
+               {
+                  BufferedImage a= ImageIO.read(new File(imgName.toString()));
+                  BufferedImage b= ImageIO.read(new File("resources/hit_peg.png"));
+                  BufferedImage combined= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
+                  Graphics g= combined.getGraphics();
+               
+                  g.drawImage(a,0,0,null);
+                  g.drawImage(b,0,0,null);
+               
+                  temp.setDisabledIcon(new ImageIcon(combined));
+               }
+               catch(IOException e){}
+                           
                imgName.delete(17,22);
             }            
          }
@@ -109,12 +146,27 @@ public class BattleshipUI
                JLabel temp= (JLabel)yourGrid.findComponentAt(yourShips[i].getLocation(j-1));
                imgName.append(j + ".png");
                temp.setIcon(new ImageIcon(imgName.toString()));
+               
+               try
+               {
+                  BufferedImage a= ImageIO.read(new File(imgName.toString()));
+                  BufferedImage b= ImageIO.read(new File("resources/hit_peg.png"));
+                  BufferedImage combined= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
+                  Graphics g= combined.getGraphics();
+               
+                  g.drawImage(a,0,0,null);
+                  g.drawImage(b,0,0,null);
+               
+                  temp.setDisabledIcon(new ImageIcon(combined));
+               }
+               catch(IOException e){}
+                           
                imgName.delete(17,22);
             }
          }   
       
          imgName= new StringBuilder("resources/");
-      }
+      }      
    }
    
    private class MouseHandler extends MouseAdapter
@@ -123,44 +175,23 @@ public class BattleshipUI
       {
          int xPos= e.getX();
          int yPos= e.getY();
-         Point clicked;
-         char yGrid= 64;
-         int xGrid;
-         StringBuilder gridLoc= new StringBuilder();
-         Attack userAttack;
          
-         if(xPos>=30 && yPos>=30)
-         { 
+         if(xPos>=30 && yPos>=30 && clientThread.getIsTurn())
+         {
+            Point clicked;
+            char yGrid= 64;
+            int xGrid;
+            StringBuilder gridLoc= new StringBuilder();
+            Attack userAttack;
+         
             clicked= new Point(xPos, yPos);
             yGrid= (char)(yGrid + (yPos/30));
             xGrid= xPos/30;
             gridLoc.append(yGrid + Integer.toString(xGrid));
-         
-            userAttack= new Attack(clicked, gridLoc.toString());
             
-            /*try //places cross over icon
-            {
-               JLabel temp= (JLabel)yourGrid.findComponentAt(clicked);
-               ImageIcon temp2= (ImageIcon)temp.getIcon();
-               BufferedImage a= ImageIO.read(new File(temp2.getDescription()));
-               BufferedImage b= ImageIO.read(new File("resources/cross.png"));
-               BufferedImage combined= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
-               Graphics g= combined.getGraphics();
+            clientThread.sendAttack(new Attack(clicked, gridLoc.toString()));
             
-               g.drawImage(a,0,0,null);
-               g.drawImage(b,0,0,null);
-            
-               temp.setIcon(new ImageIcon(combined));
-               temp.setEnabled(false);
-            }
-            catch(IOException e2)
-            {
-               System.out.println(e2.getMessage());   
-            }*/
-            
-            System.out.println(clicked);
-            System.out.println(gridLoc);
-            System.out.println(userAttack);
+            System.out.println("Attack Sent");             
          }
       }
    }
