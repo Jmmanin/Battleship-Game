@@ -31,6 +31,7 @@ public class BattleshipServer
    private JButton startButton;
    private JButton stopButton;
    private JTextArea console;
+   private JScrollPane scrollConsole;
    
    private ServerThread serverThread;
          
@@ -126,7 +127,9 @@ public class BattleshipServer
       console.setEditable(false);
       console.append("Welcome to the Battleship Multiplayer Server\n");
       console.append("Press start to open server\n");
-      rightPanel.add(console);
+      
+      scrollConsole= new JScrollPane(console);
+      rightPanel.add(scrollConsole);
       
       theFrame.add(rightPanel);
             
@@ -166,19 +169,21 @@ public class BattleshipServer
       private Socket p1Socket, p2Socket;
       private ObjectOutputStream p1Out, p2Out;
       private ObjectInputStream p1In, p2In;
-      private boolean isP1Turn;
       
       public void run()
       {
          try
          {            
-            isP1Turn= true;
+            boolean endGame= false;
+            boolean isP1Turn= true;
+            Attack fromClient= null;
             
             serverSocket1= new ServerSocket(Integer.parseInt(port1Field.getText()));
             serverSocket2= new ServerSocket(Integer.parseInt(port2Field.getText()));
          
             p1Socket= serverSocket1.accept();
             console.append("\nPlayer 1 has connected: " + p1Socket.getInetAddress().toString() + "\n");
+            console.setCaretPosition(console.getDocument().getLength());
             p2Socket= serverSocket1.accept();
                   
             p1Out= new ObjectOutputStream(p1Socket.getOutputStream());
@@ -196,48 +201,104 @@ public class BattleshipServer
             p2Socket.close();
             p2Socket= serverSocket2.accept();
             console.append("Player 2 has connected: " + p2Socket.getInetAddress().toString() + "\n");
+            console.setCaretPosition(console.getDocument().getLength());
          
             p2Out= new ObjectOutputStream(p2Socket.getOutputStream());
             p2Out.flush();
             p2In= new ObjectInputStream(p2Socket.getInputStream());
             
             console.append("Both players have connected\n\nEntering main game.\n");
+            console.setCaretPosition(console.getDocument().getLength());
                                     
-            while(true)
+            while(!endGame)
             {
                if(isP1Turn)
                {
-                  Attack fromClient= (Attack)p1In.readObject();
+                  fromClient= (Attack)p1In.readObject();
                   console.append("P1 Attacks " + fromClient.getCoordName() + ".\n");
+                  console.setCaretPosition(console.getDocument().getLength());
+                  
                   p2Out.writeObject(fromClient);
                   p2Out.flush();
+                  
                   fromClient= (Attack)p2In.readObject();
-                  console.append("P2 Confirms " + fromClient.getCoordName() + " hit/miss.\n"); //implement if else for hit/miss
+                  if(fromClient.getIsHit())
+                  {
+                     console.append("P2 confirms " + fromClient.getCoordName() + " hit " + fromClient.getShipName() + ".\n");
+                     console.setCaretPosition(console.getDocument().getLength());
+                  }
+                  else
+                  {
+                     console.append("P2 confirms " + fromClient.getCoordName() + " Miss.\n");
+                     console.setCaretPosition(console.getDocument().getLength());
+                  }
+                  if(fromClient.getShipSunk())
+                  {
+                     console.append("  P2 " + fromClient.getShipName() + " sunk.\n");
+                     console.setCaretPosition(console.getDocument().getLength());
+                  }
+                  if(fromClient.getEndGame())
+                  {
+                     console.append("P1 Wins!\n");
+                     console.setCaretPosition(console.getDocument().getLength());
+                  }
+                  
                   p1Out.writeObject(fromClient);
                   p1Out.flush();
                }      
                else
                {
-                  Attack fromClient= (Attack)p2In.readObject();
+                  fromClient= (Attack)p2In.readObject();
                   console.append("P2 Attacks " + fromClient.getCoordName() + ".\n");
+                  console.setCaretPosition(console.getDocument().getLength());
+                  
                   p1Out.writeObject(fromClient);
                   p1Out.flush();
+                  
                   fromClient= (Attack)p1In.readObject();
-                  console.append("P1 Confirms " + fromClient.getCoordName() + " hit/miss.\n"); //implement if else for hit/miss
+                  if(fromClient.getIsHit())
+                  {
+                     console.append("P1 confirms " + fromClient.getCoordName() + " hit " + fromClient.getShipName() + ".\n");
+                     console.setCaretPosition(console.getDocument().getLength());
+                  }
+                  else
+                  {
+                     console.append("P1 confirms " + fromClient.getCoordName() + " Miss.\n");
+                     console.setCaretPosition(console.getDocument().getLength());
+                  }
+                  if(fromClient.getShipSunk())
+                  {
+                     console.append("  P1 " + fromClient.getShipName() + " sunk.\n");
+                     console.setCaretPosition(console.getDocument().getLength());
+                  }
+                  if(fromClient.getEndGame())
+                  {
+                     console.append("P2 Wins!\n");
+                     console.setCaretPosition(console.getDocument().getLength());
+                  }
+                  
+                  
                   p2Out.writeObject(fromClient);
                   p2Out.flush();
                }
                
+               endGame= fromClient.getEndGame();
                isP1Turn= !isP1Turn;
             }
+            
+            console.append("\nGame has ended, press stop button to close server.");
+            console.setCaretPosition(console.getDocument().getLength());
+            //need to close connection, stop server
          }
          catch(IOException e)
          {
             console.append("\nError: " + e.getMessage());
+            console.setCaretPosition(console.getDocument().getLength());
          }
          catch(ClassNotFoundException e)
          {
             console.append("\nError: " + e.getMessage());
+            console.setCaretPosition(console.getDocument().getLength());
          }
       }
       

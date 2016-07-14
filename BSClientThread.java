@@ -7,7 +7,6 @@ Jeremy Manin
 import java.io.*;
 import java.net.*;
 import javax.swing.*;
-import java.awt.*;
 
 public class BSClientThread extends Thread
 {
@@ -18,6 +17,7 @@ public class BSClientThread extends Thread
    private ObjectOutputStream out;
    private boolean isTurn= true;
    private boolean contToMain= false;
+   private boolean endGame= false;
                      
    public BSClientThread(String hN, int pN1, int pN2)
    {
@@ -27,27 +27,21 @@ public class BSClientThread extends Thread
    }
    
    public void run()
-   {
-      JDialog waitMsgBox= new JDialog(new JFrame(),"Waiting",false);
-      JLabel waitMsg= new JLabel("Waiting for other player to join.");
-      waitMsg.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-      waitMsgBox.setContentPane(waitMsg);
-      waitMsgBox.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-      waitMsgBox.setLocationRelativeTo(null);
-      waitMsgBox.pack();
-      waitMsgBox.setVisible(true);
-         
+   {         
       try
       {  
          boolean isPlayer1;
+         Attack received;
+          
+         PlaceShips placeShips= new PlaceShips(this);
               
          bsSocket= new Socket(hostName, portNumber1);
          in= new ObjectInputStream(bsSocket.getInputStream());
          out= new ObjectOutputStream(bsSocket.getOutputStream());
          out.flush();
-         
+                  
          isPlayer1= in.readBoolean();
-      
+               
          if(!isPlayer1)
          {
             bsSocket.close();
@@ -58,41 +52,40 @@ public class BSClientThread extends Thread
          
             isTurn= false;
          }
-         
-         waitMsgBox.setVisible(false);
-         waitMsgBox.dispose();
-                     
-         PlaceShips placeShips= new PlaceShips(this);
+          
+         placeShips.closeWaitBox();
          
          synchronized(this)
          {
             while(!contToMain)
                this.wait();
          }
-         
+                  
          BattleshipUI mainGame= new BattleshipUI(placeShips.getShips(), this);
-         
-         System.out.println("main game started");
-         
-         while(true)
+                  
+         while(!endGame)
          {
             if(isTurn)
             {
-               Attack received= (Attack)in.readObject();
+               received= (Attack)in.readObject();
                mainGame.proccessAttack(received); 
             }
             else
             {
-               Attack received= (Attack)in.readObject();
+               received= (Attack)in.readObject();
                received= mainGame.proccessAttack(received);
                sendAttack(received);
             }
          
+            endGame= received.getEndGame();
+         
             out.flush();
-            isTurn= !isTurn;
             
-            mainGame.updateTurnLabel(isTurn);
+            isTurn= !isTurn;
+            mainGame.updateTurnLabels(isTurn);            
          }
+         
+         bsSocket.close();
       }
       catch(UnknownHostException e)
       {
@@ -139,26 +132,6 @@ public class BSClientThread extends Thread
          closeConnection();
       }
    }
-   
-   /*public Attack receiveAttack()
-   {
-      try
-      {
-         return((Attack)in.readObject());
-      }
-      catch(IOException e)
-      {
-         JOptionPane.showMessageDialog(null ,"Error communicating with server.\nCheck connection to server and try again.", "Communication Error", JOptionPane.ERROR_MESSAGE);          
-         closeConnection();
-         return(null);
-      }
-      catch(ClassNotFoundException e)
-      {
-         JOptionPane.showMessageDialog(null ,"Error sending attack.\nCheck connection to server and try again.", "Communication Error", JOptionPane.ERROR_MESSAGE);          
-         closeConnection();
-         return(null);
-      }
-   }*/
    
    public void closeConnection()
    {

@@ -92,6 +92,11 @@ public class Ship
       return(spacesOccupied[i]);
    }
    
+   public boolean getIsSunk()
+   {
+      return(isSunk);
+   }
+   
    public boolean contains(Point p)
    {      
       for(int i= 0;i<size;i++)
@@ -103,16 +108,19 @@ public class Ship
       return(false);   
    }
    
-   public void hitSpace(Point p)
+   public boolean hitSpace(Point p)
    {
+      boolean toReturn= false;
+      
       for(int i= 0;i<size;i++)
       {
-         if(this.contains(p))
+         if(getOccupiedSpace(i).contains(p))
          {
             if(!spacesHit[i])
             {
                spacesHit[i]= true;
                hitCount++;
+               toReturn= true;
             }
             
             break;
@@ -121,6 +129,8 @@ public class Ship
       
       if(hitCount==size)
          isSunk= true;
+         
+      return(toReturn);   
    }
    
    public boolean isSunk()

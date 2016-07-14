@@ -26,17 +26,46 @@ public class Attack implements Serializable
       endGame= false;
    }
    
-   public void setIsHit(String sN, boolean sS, boolean eG)
+   public void setIsHit(String sN, boolean sS)
    {
       isHit= true;
       shipName= sN;
       shipSunk= sS;
+   }
+   
+   public void setEndGame(boolean eG)
+   {
       endGame= eG;
+   }
+   
+   public Point getCoords()
+   {
+      return(coords);
    }
    
    public String getCoordName()
    {
       return(coordName);
+   }
+   
+   public boolean getIsHit()
+   {
+      return(isHit);
+   }
+   
+   public String getShipName()
+   {
+      return(shipName);
+   }
+   
+   public boolean getShipSunk()
+   {
+      return(shipSunk);
+   }
+   
+   public boolean getEndGame()
+   {
+      return(endGame);
    }
    
    public String toString()
