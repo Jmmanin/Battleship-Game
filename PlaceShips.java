@@ -55,6 +55,7 @@ public class PlaceShips
       theFrame.getContentPane().setLayout(new BoxLayout(theFrame.getContentPane(), BoxLayout.Y_AXIS));
    
       msgPanel= new JPanel(new GridLayout(1,3));
+      msgPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 0, 10));
       
       msgLabel= new JLabel("Select a ship to place.");
       
@@ -69,7 +70,8 @@ public class PlaceShips
       msgPanel.add(orientLabel);
       
       theFrame.add(msgPanel);
-      
+      theFrame.add(Box.createRigidArea(new Dimension(0,5)));
+                  
       buttonPanel= new JPanel(new GridLayout(1,5));
             
       doneButton= new JButton("Done");
@@ -129,8 +131,10 @@ public class PlaceShips
       
       shipPanel.addMouseListener(new ShipMouser());
       
+      theFrame.add(Box.createRigidArea(new Dimension(0,10)));
       theFrame.add(new JSeparator(SwingConstants.HORIZONTAL));
       theFrame.add(shipPanel);
+      theFrame.add(Box.createRigidArea(new Dimension(0,5)));
       
       theFrame.pack();
       theFrame.setLocationRelativeTo(null);
@@ -199,7 +203,7 @@ public class PlaceShips
                   caPlaced= placeShip(imgName, clicked, shipOrientation, 5);
                   if(caPlaced==true)
                   {
-                     msgLabel.setText("Aircraft Carrier placed");
+                     msgLabel.setText("Carrier placed");
                      carrier.setEnabled(false);
                   }   
                }
@@ -254,7 +258,7 @@ public class PlaceShips
                   {
                      carrier.setEnabled(true);
                      caPlaced= false;
-                     msgLabel.setText("Aircraft Carrier Removed");
+                     msgLabel.setText("Carrier Removed");
                   }
                   else if(ships[i].getName()=="cr")
                   {
@@ -344,7 +348,10 @@ public class PlaceShips
                for(i=0;i<shipsAdded;i++)
                {
                   if(ships[shipsAdded].getTotalSpaceOccupied().intersects(ships[i].getTotalSpaceOccupied()))
+                  {
+                     msgLabel.setText("Intersects other ship"); 
                      return(false);
+                  }
                }
             }
                 
@@ -404,7 +411,7 @@ public class PlaceShips
             }
             if(shipPanel.findComponentAt(xPos,yPos)==carrier)
             {
-               msgLabel.setText("Aircraft Carrier selected");
+               msgLabel.setText("Carrier selected");
                shipSelected= "ca";
             }
             if(shipPanel.findComponentAt(xPos,yPos)==cruiser)
