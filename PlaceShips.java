@@ -1,7 +1,7 @@
 /*
 Multiplayer Battleship Game
 PlaceShips
-Jeremy Manin and John Dott
+Jeremy Manin
 */
 
 import javax.swing.*;
@@ -31,7 +31,9 @@ public class PlaceShips
    private JLabel modeLabel;
    private JLabel orientLabel;
    
-   private File imgPath;
+   private JDialog waitMsgBox;
+   private JLabel waitMsg;
+   
    private int mode;
    private int shipOrientation;
    private String shipSelected;
@@ -42,8 +44,10 @@ public class PlaceShips
    private boolean suPlaced;
    private int shipsAdded;
    private Ship[] ships;
+      
+   private BSClientThread clientThread;
    
-   public PlaceShips()
+   public PlaceShips(BSClientThread cT)
    {
       theFrame= new JFrame("Ship Placement");
       theFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -51,6 +55,7 @@ public class PlaceShips
       theFrame.getContentPane().setLayout(new BoxLayout(theFrame.getContentPane(), BoxLayout.Y_AXIS));
    
       msgPanel= new JPanel(new GridLayout(1,3));
+      msgPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 0, 10));
       
       msgLabel= new JLabel("Select a ship to place.");
       
@@ -65,18 +70,17 @@ public class PlaceShips
       msgPanel.add(orientLabel);
       
       theFrame.add(msgPanel);
-      
+      theFrame.add(Box.createRigidArea(new Dimension(0,5)));
+                  
       buttonPanel= new JPanel(new GridLayout(1,5));
             
       doneButton= new JButton("Done");
-      doneButton.addActionListener(new DoneButtonHandler());
+      doneButton.addActionListener(new DoneButtonListener());
       doneButton.setEnabled(false);
-      
-      imgPath= new File("resources");
-      
+            
       mode= 0;      
       modeButton= new JButton("Mode");
-      modeButton.addActionListener(new ModeButtonHandler());
+      modeButton.addActionListener(new ModeButtonListener());
       
       buttonPanel.add(new JLabel());
       buttonPanel.add(modeButton);
@@ -85,6 +89,7 @@ public class PlaceShips
       buttonPanel.add(new JLabel());
       
       theFrame.add(buttonPanel);
+      theFrame.add(new JSeparator(SwingConstants.HORIZONTAL));
             
       gridPanel= new JPanel();
       gridPanel.setLayout(new BoxLayout(gridPanel,BoxLayout.X_AXIS));
@@ -101,11 +106,11 @@ public class PlaceShips
       shipPanel= new JPanel();
       shipPanel.setLayout(new GridLayout(2,3));
       
-      ImageIcon bsImg= new ImageIcon("resources/battleship.png");
-      ImageIcon caImg= new ImageIcon("resources/carrier.png");
-      ImageIcon crImg= new ImageIcon("resources/cruiser.png");
-      ImageIcon deImg= new ImageIcon("resources/destroyer.png");
-      ImageIcon suImg= new ImageIcon("resources/submarine.png");
+      ImageIcon bsImg= new ImageIcon("resources/ba_hor.png");
+      ImageIcon caImg= new ImageIcon("resources/ca_hor.png");
+      ImageIcon crImg= new ImageIcon("resources/cr_hor.png");
+      ImageIcon deImg= new ImageIcon("resources/de_hor.png");
+      ImageIcon suImg= new ImageIcon("resources/su_hor.png");
       
       battleship= new JLabel(bsImg);
       carrier= new JLabel(caImg);
@@ -115,7 +120,7 @@ public class PlaceShips
    
       shipOrientation= 0;
       orientation= new JButton("Change Orientation");
-      orientation.addActionListener(new OrientationButtonHandler());
+      orientation.addActionListener(new OrientationButtonListener());
       
       shipPanel.add(battleship);
       shipPanel.add(carrier);
@@ -126,10 +131,22 @@ public class PlaceShips
       
       shipPanel.addMouseListener(new ShipMouser());
       
+      theFrame.add(Box.createRigidArea(new Dimension(0,10)));
+      theFrame.add(new JSeparator(SwingConstants.HORIZONTAL));
       theFrame.add(shipPanel);
+      theFrame.add(Box.createRigidArea(new Dimension(0,5)));
       
       theFrame.pack();
-      theFrame.setVisible(true);
+      theFrame.setLocationRelativeTo(null);
+      
+      waitMsgBox= new JDialog(theFrame,"Waiting",false);
+      waitMsg= new JLabel("Waiting for other player to join.");
+      waitMsg.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+      waitMsgBox.setContentPane(waitMsg);
+      waitMsgBox.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+      waitMsgBox.pack();
+      waitMsgBox.setLocationRelativeTo(null);
+      waitMsgBox.setVisible(true);
       
       shipSelected= null;
       baPlaced= false;
@@ -140,6 +157,20 @@ public class PlaceShips
       
       shipsAdded= 0;
       ships= new Ship[5];
+      
+      clientThread= cT;      
+   }
+   
+   public void closeWaitBox()
+   {
+      waitMsgBox.setVisible(false);
+      waitMsgBox.dispose();      
+      theFrame.setVisible(true);
+   }
+   
+   public Ship[] getShips()
+   {
+      return(ships);
    }
    
    private class GridMouser extends MouseAdapter
@@ -172,7 +203,7 @@ public class PlaceShips
                   caPlaced= placeShip(imgName, clicked, shipOrientation, 5);
                   if(caPlaced==true)
                   {
-                     msgLabel.setText("Aircraft Carrier placed");
+                     msgLabel.setText("Carrier placed");
                      carrier.setEnabled(false);
                   }   
                }
@@ -227,7 +258,7 @@ public class PlaceShips
                   {
                      carrier.setEnabled(true);
                      caPlaced= false;
-                     msgLabel.setText("Aircraft Carrier Removed");
+                     msgLabel.setText("Carrier Removed");
                   }
                   else if(ships[i].getName()=="cr")
                   {
@@ -261,68 +292,93 @@ public class PlaceShips
       
       private boolean placeShip(StringBuilder imgName, Point tempPoint, int orientation, int size)
       {
-         JLabel temp;
-         Point[] points= new Point[size];
-         int i;
-      
-         if(orientation==0)
+         try
          {
-            if(tempPoint.getX()<(330-((size-1)*30)))
-            {               
-               imgName.append("hor_");
-               
-               for(i=1;i<=size;i++)
-               {
-                  points[i-1]= new Point(tempPoint);
-                  tempPoint.setLocation(tempPoint.getX()+30,tempPoint.getY());   
-               }
-            }
-            else
-            {
-               msgLabel.setText("Too close to edge");
-               return(false);
-            }     
-         }
-         else
-         {
-            if(tempPoint.getY()<(330-((size-1)*30)))
-            {
-               imgName.append("ver_");
-               
-               for(i=1;i<=size;i++)
-               {
-                  points[i-1]= new Point(tempPoint);
-                  tempPoint.setLocation(tempPoint.getX(),tempPoint.getY()+30);   
-               }
-            }
-            else
-            {
-               msgLabel.setText("Too close to edge");
-               return(false);
-            }
-         }
+            BufferedImage shipImg;
+            Point[] points= new Point[size];
+            BufferedImage bgImg= ImageIO.read(new File("resources/ocean.png"));
+            BufferedImage combined;
+            JLabel temp;
+            int xPos= 0, yPos= 0;
+            int i;
          
-         ships[shipsAdded]= new Ship(shipSelected,size,shipOrientation,points);
-      
-         if(shipsAdded>0)
-         {
-            for(i=0;i<shipsAdded;i++)
+            if(orientation==0)
             {
-               if(ships[shipsAdded].getSpaceOccupied().intersects(ships[i].getSpaceOccupied()))
+               if(tempPoint.getX()<(330-((size-1)*30)))
+               {               
+                  imgName.append("hor.png");
+                  shipImg= ImageIO.read(new File(imgName.toString()));
+               
+                  for(i=0;i<size;i++)
+                  {
+                     points[i]= new Point(tempPoint);
+                     tempPoint.setLocation(tempPoint.getX()+30,tempPoint.getY());   
+                  }
+               }
+               else
+               {
+                  msgLabel.setText("Too close to edge");
                   return(false);
+               }     
             }
-         }
-                
-         for(i=1;i<=ships[shipsAdded].getSize();i++)
-         {
-            temp= (JLabel)theGrid.findComponentAt(ships[shipsAdded].getLocation(i-1));
-            imgName.append(i + ".png");
-            temp.setIcon(new ImageIcon(imgName.toString()));
-            imgName.delete(17,22);
-         }
+            else
+            {
+               if(tempPoint.getY()<(330-((size-1)*30)))
+               {
+                  imgName.append("ver.png");
+                  shipImg= ImageIO.read(new File(imgName.toString()));
+               
+                  for(i=0;i<size;i++)
+                  {
+                     points[i]= new Point(tempPoint);
+                     tempPoint.setLocation(tempPoint.getX(),tempPoint.getY()+30);   
+                  }
+               }
+               else
+               {
+                  msgLabel.setText("Too close to edge");
+                  return(false);
+               }
+            }
          
-         shipsAdded++;
-         return(true);
+            ships[shipsAdded]= new Ship(shipSelected,size,shipOrientation,points);
+         
+            if(shipsAdded>0)
+            {
+               for(i=0;i<shipsAdded;i++)
+               {
+                  if(ships[shipsAdded].getTotalSpaceOccupied().intersects(ships[i].getTotalSpaceOccupied()))
+                  {
+                     msgLabel.setText("Intersects other ship"); 
+                     return(false);
+                  }
+               }
+            }
+                
+            for(i=0;i<ships[shipsAdded].getSize();i++)
+            {
+               temp= (JLabel)theGrid.findComponentAt(ships[shipsAdded].getLocation(i));
+            
+               combined= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
+               Graphics g= combined.getGraphics();
+               
+               g.drawImage(bgImg,0,0,null);
+               g.drawImage(shipImg.getSubimage(xPos,yPos,30,30),0,0,null);
+                                    
+               temp.setIcon(new ImageIcon(combined));
+            
+               if(shipOrientation==0)
+                  xPos= xPos+30;
+               else
+                  yPos= yPos+30;   
+            }
+         
+            shipsAdded++;
+            return(true);
+         }
+         catch(IOException e){}
+         
+         return(false);
       }
       
       private void eraseShip(Ship toErase)
@@ -355,7 +411,7 @@ public class PlaceShips
             }
             if(shipPanel.findComponentAt(xPos,yPos)==carrier)
             {
-               msgLabel.setText("Aircraft Carrier selected");
+               msgLabel.setText("Carrier selected");
                shipSelected= "ca";
             }
             if(shipPanel.findComponentAt(xPos,yPos)==cruiser)
@@ -377,7 +433,7 @@ public class PlaceShips
       }
    }
    
-   private class OrientationButtonHandler implements ActionListener
+   private class OrientationButtonListener implements ActionListener
    {
       public void actionPerformed(ActionEvent e)
       {
@@ -394,7 +450,7 @@ public class PlaceShips
       }
    }
    
-   private class ModeButtonHandler implements ActionListener
+   private class ModeButtonListener implements ActionListener
    {
       public void actionPerformed(ActionEvent e)
       {
@@ -411,17 +467,22 @@ public class PlaceShips
       }
    } 
       
-   private class DoneButtonHandler implements ActionListener
+   private class DoneButtonListener implements ActionListener
    {
       public void actionPerformed(ActionEvent e)
-      {
-         new BattleShipUI(ships);
-         //theFrame.setVisible(false);
+      {               
+         theFrame.setVisible(false);
+         theFrame.dispose();   
+         clientThread.setContToMain(true);
+         synchronized(clientThread)
+         {
+            clientThread.notifyAll();
+         }
       }
    }   
    
-   public static void main(String args[])
+   /*public static void main(String args[])
    {
-      new PlaceShips();
-   }
+      new PlaceShips(null,0,0);
+   }*/
 }
