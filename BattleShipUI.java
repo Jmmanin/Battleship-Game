@@ -13,7 +13,8 @@ import javax.imageio.ImageIO;
 
 public class BattleshipUI
 {
-   private JFrame gameUI;
+   private JFrame theFrame;
+   private JPanel gamePanel;
    private BSGrid enemyGrid;
    private JPanel msgPanel;
    private JLabel msgLabel;
@@ -22,6 +23,13 @@ public class BattleshipUI
    private JLabel turnLabel;
    private JLabel turnNumLabel;
    private JLabel statusTime;
+   private JPanel shipsRemainingPanel;
+   private JLabel shipsRemainingLabel;
+   private JLabel battleship;
+   private JLabel carrier;
+   private JLabel cruiser;
+   private JLabel destroyer;
+   private JLabel submarine;
    
    private WaitDialog waitDialog;
    
@@ -34,10 +42,13 @@ public class BattleshipUI
    {
       clientThread= cT;
       
-      gameUI= new JFrame("Battleship Game");
-      gameUI.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      gameUI.setResizable(false);
-      gameUI.getContentPane().setLayout(new BoxLayout(gameUI.getContentPane(), BoxLayout.Y_AXIS));
+      theFrame= new JFrame("Battleship Game");
+      theFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      theFrame.setResizable(false);
+      theFrame.getContentPane().setLayout(new BoxLayout(theFrame.getContentPane(), BoxLayout.X_AXIS));
+      
+      gamePanel= new JPanel();
+      gamePanel.setLayout(new BoxLayout(gamePanel, BoxLayout.Y_AXIS));
       
       enemyGrid= new BSGrid(10);
       enemyGrid.addMouseListener(new MouseHandler());
@@ -46,20 +57,20 @@ public class BattleshipUI
       msgPanel.setLayout(new BoxLayout(msgPanel, BoxLayout.Y_AXIS));
             
       statusPanel= new JPanel();
-      statusPanel.setLayout(new GridLayout(1,3));
+      statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
       
       if(clientThread.getIsTurn())
          turnLabel= new JLabel("Your Turn");
       else
          turnLabel= new JLabel("Enemy Turn");
-      turnLabel.setHorizontalAlignment(SwingConstants.CENTER);
+      turnLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
    
       turnCounter= 0;
       turnNumLabel= new JLabel("Turn: " + turnCounter);
-      turnNumLabel.setHorizontalAlignment(SwingConstants.CENTER);
+      turnNumLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
    
       statusPanel.add(turnLabel);
-      statusPanel.add(new JLabel());
+      statusPanel.add(Box.createHorizontalStrut(180));
       statusPanel.add(turnNumLabel);
    
       msgPanel.add(statusPanel);
@@ -68,22 +79,69 @@ public class BattleshipUI
          msgLabel= new JLabel("Make your first attack.");
       else
          msgLabel= new JLabel("Scanning for enemy attack.");
-      msgLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
       msgLabel.setFont(new Font("Arial",Font.BOLD,16));
+      msgLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+      msgLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
       msgPanel.add(msgLabel);
       
       yourGrid= new BSGrid(10);
             
-      gameUI.add(enemyGrid);
-      gameUI.add(new JSeparator(SwingConstants.HORIZONTAL));
-      gameUI.add(msgPanel);
-      gameUI.add(new JSeparator(SwingConstants.HORIZONTAL));
-      gameUI.add(yourGrid);
-      gameUI.add(Box.createRigidArea(new Dimension(0,5)));
+      gamePanel.add(enemyGrid);
+      gamePanel.add(Box.createVerticalStrut(10));
+      gamePanel.add(new JSeparator(SwingConstants.HORIZONTAL));
+      gamePanel.add(msgPanel);
+      gamePanel.add(new JSeparator(SwingConstants.HORIZONTAL));
+      gamePanel.add(yourGrid);
+      gamePanel.add(Box.createVerticalStrut(8));
       
-      gameUI.pack();
-      gameUI.setLocationRelativeTo(null);
-      gameUI.setVisible(true);
+      shipsRemainingPanel= new JPanel();
+      shipsRemainingPanel.setLayout(new BoxLayout(shipsRemainingPanel, BoxLayout.Y_AXIS));
+      
+      shipsRemainingLabel= new JLabel("<html><center>Enemy<br>Ships<br>Remaining</center></html>");
+      shipsRemainingLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+      shipsRemainingLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
+               
+      battleship= new JLabel(new ImageIcon("resources/ba_ver.png"));
+      battleship.setAlignmentX(Component.CENTER_ALIGNMENT);
+      battleship.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+      carrier= new JLabel(new ImageIcon("resources/ca_ver.png"));
+      carrier.setAlignmentX(Component.CENTER_ALIGNMENT);
+      carrier.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+      cruiser= new JLabel(new ImageIcon("resources/cr_ver.png"));
+      cruiser.setAlignmentX(Component.CENTER_ALIGNMENT);
+      cruiser.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+      destroyer= new JLabel(new ImageIcon("resources/de_ver.png"));
+      destroyer.setAlignmentX(Component.CENTER_ALIGNMENT);
+      destroyer.setAlignmentY(Component.CENTER_ALIGNMENT);
+
+      submarine= new JLabel(new ImageIcon("resources/su_ver.png"));
+      submarine.setAlignmentX(Component.CENTER_ALIGNMENT);
+      submarine.setAlignmentY(Component.CENTER_ALIGNMENT);
+      
+      shipsRemainingPanel.add(Box.createVerticalStrut(15));
+      shipsRemainingPanel.add(shipsRemainingLabel);
+      shipsRemainingPanel.add(Box.createVerticalStrut(15));
+      shipsRemainingPanel.add(battleship);
+      shipsRemainingPanel.add(Box.createVerticalStrut(15));
+      shipsRemainingPanel.add(carrier);
+      shipsRemainingPanel.add(Box.createVerticalStrut(15));
+      shipsRemainingPanel.add(cruiser);
+      shipsRemainingPanel.add(Box.createVerticalStrut(15));
+      shipsRemainingPanel.add(destroyer);
+      shipsRemainingPanel.add(Box.createVerticalStrut(15));
+      shipsRemainingPanel.add(submarine);
+      shipsRemainingPanel.add(Box.createVerticalStrut(15));
+                  
+      theFrame.add(gamePanel);
+      theFrame.add(new JSeparator(SwingConstants.VERTICAL));
+      theFrame.add(shipsRemainingPanel);
+      theFrame.add(Box.createHorizontalStrut(8));
+      theFrame.pack();
+      theFrame.setLocationRelativeTo(null);
+      theFrame.setVisible(true);
             
       yourShips= yS;
       placeYourShips(yourShips);
@@ -166,7 +224,7 @@ public class BattleshipUI
          if(turnCounter==0)
          {
             waitDialog.close();
-            JOptionPane.showMessageDialog(gameUI, "Attack launched! Prepare for return fire!\nBattle stations! Battle stations!\nThis is not a drill!", "Attention Admiral!", JOptionPane.INFORMATION_MESSAGE, new ImageIcon("resources/alarm.png"));
+            JOptionPane.showMessageDialog(theFrame, "Attack launched! Prepare for return fire!\nBattle stations! Battle stations!\nThis is not a drill!", "Attention Admiral!", JOptionPane.INFORMATION_MESSAGE, new ImageIcon("resources/alarm.png"));
          }
          
          temp= (JLabel)enemyGrid.findComponentAt(toProccess.getCoords());
@@ -213,7 +271,7 @@ public class BattleshipUI
       else
       {
          if(turnCounter==0)
-            JOptionPane.showMessageDialog(gameUI, "Enemy fleet activity detected!\nBattle stations! Battle stations!\nThis is not a drill!", "Attention Admiral!", JOptionPane.INFORMATION_MESSAGE, new ImageIcon("resources/alarm.png"));
+            JOptionPane.showMessageDialog(theFrame, "Enemy fleet activity detected!\nBattle stations! Battle stations!\nThis is not a drill!", "Attention Admiral!", JOptionPane.INFORMATION_MESSAGE, new ImageIcon("resources/alarm.png"));
          
          temp= (JLabel)yourGrid.findComponentAt(toProccess.getCoords());
          
@@ -313,7 +371,7 @@ public class BattleshipUI
       
       public WaitDialog()
       {
-         waitBox= new JDialog(gameUI,"Targeting",false);
+         waitBox= new JDialog(theFrame,"Targeting",false);
          waitPanel= new JPanel();
          waitPanel.setLayout(new BoxLayout(waitPanel, BoxLayout.X_AXIS));
          waitPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -326,7 +384,7 @@ public class BattleshipUI
          waitBox.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
          waitBox.pack();
          waitBox.setResizable(false);
-         waitBox.setLocationRelativeTo(gameUI);
+         waitBox.setLocationRelativeTo(theFrame);
          waitBox.setVisible(true);
       }
       
@@ -349,7 +407,7 @@ public class BattleshipUI
       
       public ShipSunkDialog(boolean turn, String shipName)
       {
-         shipSunkBox= new JDialog(gameUI,"Attention Admiral!",false);
+         shipSunkBox= new JDialog(theFrame,"Attention Admiral!",false);
          shipSunkPanel= new JPanel();
          shipSunkPanel.setLayout(new BoxLayout(shipSunkPanel, BoxLayout.Y_AXIS));
          shipSunkPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -365,15 +423,30 @@ public class BattleshipUI
          if(turn)
          {
             if(shipName.equals("ba"))
+            {
                shipSunkMsg= new JLabel("Enemy battleship has been sunk!");
+               battleship.setEnabled(false);
+            }
             else if(shipName.equals("ca"))
+            {
                shipSunkMsg= new JLabel("Enemy carrier has been sunk!");
+               carrier.setEnabled(false);
+            }
             else if(shipName.equals("cr"))
+            {
                shipSunkMsg= new JLabel("Enemy cruiser has been sunk!");
+               cruiser.setEnabled(false);
+            }
             else if(shipName.equals("de"))
+            {
                shipSunkMsg= new JLabel("Enemy destroyer has been sunk!");
+               destroyer.setEnabled(false);
+            }
             else
+            {
                shipSunkMsg= new JLabel("Enemy submarine has been sunk!");
+               submarine.setEnabled(false);
+            }
          }
          else
          {
@@ -404,7 +477,7 @@ public class BattleshipUI
          shipSunkBox.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
          shipSunkBox.pack();
          shipSunkBox.setResizable(false);
-         shipSunkBox.setLocationRelativeTo(gameUI);
+         shipSunkBox.setLocationRelativeTo(theFrame);
          shipSunkBox.setVisible(true);
       }
       
@@ -425,7 +498,7 @@ public class BattleshipUI
          
       public GameOverDialog(boolean win)
       {
-         gameOverBox= new JDialog(gameUI,"Game Over",false);
+         gameOverBox= new JDialog(theFrame,"Game Over",false);
          gameOverPanel= new JPanel();
          gameOverPanel.setLayout(new BoxLayout(gameOverPanel, BoxLayout.Y_AXIS));
          gameOverPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -456,7 +529,7 @@ public class BattleshipUI
          gameOverBox.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
          gameOverBox.pack();
          gameOverBox.setResizable(false);
-         gameOverBox.setLocationRelativeTo(gameUI);
+         gameOverBox.setLocationRelativeTo(theFrame);
          gameOverBox.setVisible(true);
       }
          

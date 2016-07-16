@@ -14,7 +14,6 @@ import javax.imageio.ImageIO;
 public class BSGrid extends JPanel
 {
    private int size;
-   private int xPos, yPos;
    
    public BSGrid(int s)
    {

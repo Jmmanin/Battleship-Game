@@ -73,7 +73,7 @@ public class BattleshipClient
       confirmPanel= new JPanel();
       confirmPanel.setLayout(new BorderLayout());
        
-      aboutLabel= new JLabel("By: Jeremy Manin, ©Hasbro");
+      aboutLabel= new JLabel(" By: Jeremy Manin, ©Hasbro");
       confirmPanel.add(aboutLabel, BorderLayout.WEST);
             
       confirm= new JButton("Start Game");
