@@ -1,7 +1,7 @@
 /*
 Multiplayer Battleship Game
 Ship Object
-Jeremy Manin and John Dott
+Jeremy Manin
 */
 
 import java.awt.*;

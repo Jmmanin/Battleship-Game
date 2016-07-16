@@ -207,7 +207,7 @@ public class BattleshipServer
             p2Out.flush();
             p2In= new ObjectInputStream(p2Socket.getInputStream());
             
-            console.append("Both players have connected\n\nEntering main game.\n");
+            console.append("Both players have connected\n\nEntering main game.\n\n");
             console.setCaretPosition(console.getDocument().getLength());
                                     
             while(!endGame)
@@ -215,7 +215,7 @@ public class BattleshipServer
                if(isP1Turn)
                {
                   fromClient= (Attack)p1In.readObject();
-                  console.append("P1 Attacks " + fromClient.getCoordName() + ".\n");
+                  console.append("P1 attacks " + fromClient.getCoordName() + ".\n");
                   console.setCaretPosition(console.getDocument().getLength());
                   
                   p2Out.writeObject(fromClient);
@@ -224,7 +224,7 @@ public class BattleshipServer
                   fromClient= (Attack)p2In.readObject();
                   if(fromClient.getIsHit())
                   {
-                     console.append("P2 confirms " + fromClient.getCoordName() + " hit " + fromClient.getShipName() + ".\n");
+                     console.append("P2 confirms " + fromClient.getCoordName() + " hits " + fromClient.getShipName() + ".\n");
                      console.setCaretPosition(console.getDocument().getLength());
                   }
                   else
@@ -249,7 +249,7 @@ public class BattleshipServer
                else
                {
                   fromClient= (Attack)p2In.readObject();
-                  console.append("P2 Attacks " + fromClient.getCoordName() + ".\n");
+                  console.append("P2 attacks " + fromClient.getCoordName() + ".\n");
                   console.setCaretPosition(console.getDocument().getLength());
                   
                   p1Out.writeObject(fromClient);
@@ -258,7 +258,7 @@ public class BattleshipServer
                   fromClient= (Attack)p1In.readObject();
                   if(fromClient.getIsHit())
                   {
-                     console.append("P1 confirms " + fromClient.getCoordName() + " hit " + fromClient.getShipName() + ".\n");
+                     console.append("P1 confirms " + fromClient.getCoordName() + " hits " + fromClient.getShipName() + ".\n");
                      console.setCaretPosition(console.getDocument().getLength());
                   }
                   else
@@ -282,13 +282,13 @@ public class BattleshipServer
                   p2Out.flush();
                }
                
+               console.append("\n");
                endGame= fromClient.getEndGame();
                isP1Turn= !isP1Turn;
             }
             
-            console.append("\nGame has ended, press stop button to close server.");
+            console.append("Game has ended.\nPress stop button to close server.");
             console.setCaretPosition(console.getDocument().getLength());
-            //need to close connection, stop server
          }
          catch(IOException e)
          {

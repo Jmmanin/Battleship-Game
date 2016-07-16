@@ -104,19 +104,19 @@ public class BattleshipUI
       battleship= new JLabel(new ImageIcon("resources/ba_ver.png"));
       battleship.setAlignmentX(Component.CENTER_ALIGNMENT);
       battleship.setAlignmentY(Component.CENTER_ALIGNMENT);
-
+   
       carrier= new JLabel(new ImageIcon("resources/ca_ver.png"));
       carrier.setAlignmentX(Component.CENTER_ALIGNMENT);
       carrier.setAlignmentY(Component.CENTER_ALIGNMENT);
-
+   
       cruiser= new JLabel(new ImageIcon("resources/cr_ver.png"));
       cruiser.setAlignmentX(Component.CENTER_ALIGNMENT);
       cruiser.setAlignmentY(Component.CENTER_ALIGNMENT);
-
+   
       destroyer= new JLabel(new ImageIcon("resources/de_ver.png"));
       destroyer.setAlignmentX(Component.CENTER_ALIGNMENT);
       destroyer.setAlignmentY(Component.CENTER_ALIGNMENT);
-
+   
       submarine= new JLabel(new ImageIcon("resources/su_ver.png"));
       submarine.setAlignmentX(Component.CENTER_ALIGNMENT);
       submarine.setAlignmentY(Component.CENTER_ALIGNMENT);
@@ -227,6 +227,9 @@ public class BattleshipUI
             JOptionPane.showMessageDialog(theFrame, "Attack launched! Prepare for return fire!\nBattle stations! Battle stations!\nThis is not a drill!", "Attention Admiral!", JOptionPane.INFORMATION_MESSAGE, new ImageIcon("resources/alarm.png"));
          }
          
+         if(toProccess.getEndGame())
+            new GameOverDialog(true);   
+         
          temp= (JLabel)enemyGrid.findComponentAt(toProccess.getCoords());
          
          message.append("Attack at " + toProccess.getCoordName());
@@ -263,10 +266,7 @@ public class BattleshipUI
                new ShipSunkDialog(true, toProccess.getShipName());   
          }
          else
-            message.append(" misses.");
-            
-         if(toProccess.getEndGame())
-            new GameOverDialog(true);   
+            message.append(" misses.");            
       }
       else
       {
@@ -300,12 +300,9 @@ public class BattleshipUI
             }   
          }
          
-         if(toProccess.getShipSunk())
-            new ShipSunkDialog(false, toProccess.getShipName());   
-         
          if(!shipHit)
             message.append(" misses.");
-         
+                     
          for(i=0;i<yourShips.length;i++)
          {
             if(!yourShips[i].getIsSunk())
@@ -316,6 +313,9 @@ public class BattleshipUI
             new GameOverDialog(false);
          
          toProccess.setEndGame(endGame);
+         
+         if(toProccess.getShipSunk())
+            new ShipSunkDialog(false, toProccess.getShipName());            
       }
       
       temp.setEnabled(false);
@@ -457,9 +457,9 @@ public class BattleshipUI
             else if(shipName.equals("cr"))
                shipSunkMsg= new JLabel("Cruiser has been sunk!");
             else if(shipName.equals("de"))
-               shipSunkMsg= new JLabel("Battleship has been sunk!");
-            else
                shipSunkMsg= new JLabel("Destroyer has been sunk!");
+            else
+               shipSunkMsg= new JLabel("Submarine has been sunk!");
          }
          shipSunkMsgPanel.add(shipSunkMsg);
          
