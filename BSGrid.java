@@ -18,24 +18,20 @@ public class BSGrid extends JPanel
    {
       size= s;
       JLabel tempLabel;
-      ImageIcon gridBG= new ImageIcon("resources/ocean.png");
+      ImageIcon gridBG= new ImageIcon(getImageFile("/resources/ocean.png"));
       ImageIcon disabledGridBG= null;
       char rowChar= 'A';
       
-      try
-      {
-         BufferedImage a= ImageIO.read(new File(gridBG.getDescription()));
-         BufferedImage b= ImageIO.read(new File("resources/miss_peg.png"));
-         BufferedImage combined= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
-         Graphics g= combined.getGraphics();
+      BufferedImage a= getImageFile("/resources/ocean.png");
+      BufferedImage b= getImageFile("/resources/miss_peg.png");
+      BufferedImage combined= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
+      Graphics g= combined.getGraphics();
             
-         g.drawImage(a,0,0,null);
-         g.drawImage(b,0,0,null);
+      g.drawImage(a,0,0,null);
+      g.drawImage(b,0,0,null);
             
-         disabledGridBG= new ImageIcon(combined);
-      }
-      catch(IOException e){}
-                  
+      disabledGridBG= new ImageIcon(combined);
+                           
       setLayout(new GridLayout(11,11));
       
       add(new JLabel());
@@ -63,5 +59,20 @@ public class BSGrid extends JPanel
          tempLabel.setHorizontalAlignment(SwingConstants.CENTER);
          add(tempLabel);
       }
+   }
+   
+   private BufferedImage getImageFile(String filename)
+   {
+      try
+      {
+         return((BufferedImage)ImageIO.read(BSGrid.class.getResourceAsStream(filename)));
+      }
+      catch(Exception e)
+      {
+         JOptionPane.showMessageDialog(null ,"Error loading image resource.", "Load Error", JOptionPane.ERROR_MESSAGE);          
+         System.exit(1);
+      }
+      
+      return(null);
    }
 }

@@ -110,11 +110,11 @@ public class PlaceShips
       shipPanel= new JPanel();
       shipPanel.setLayout(new GridLayout(2,3));
       
-      ImageIcon bsImg= new ImageIcon("resources/ba_hor.png");
-      ImageIcon caImg= new ImageIcon("resources/ca_hor.png");
-      ImageIcon crImg= new ImageIcon("resources/cr_hor.png");
-      ImageIcon deImg= new ImageIcon("resources/de_hor.png");
-      ImageIcon suImg= new ImageIcon("resources/su_hor.png");
+      ImageIcon bsImg= new ImageIcon(getImageFile("/resources/ba_hor.png"));
+      ImageIcon caImg= new ImageIcon(getImageFile("/resources/ca_hor.png"));
+      ImageIcon crImg= new ImageIcon(getImageFile("/resources/cr_hor.png"));
+      ImageIcon deImg= new ImageIcon(getImageFile("/resources/de_hor.png"));
+      ImageIcon suImg= new ImageIcon(getImageFile("/resources/su_hor.png"));
       
       battleship= new JLabel(bsImg);
       carrier= new JLabel(caImg);
@@ -143,7 +143,7 @@ public class PlaceShips
       theFrame.pack();
       theFrame.setLocationRelativeTo(null);
       
-      waitMsgBox= new JDialog(theFrame,"Waiting",false);
+      waitMsgBox= new JDialog(theFrame,"Waiting",false); //make class
       waitMsg= new JLabel("Waiting for other player to join.");
       waitMsg.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
       waitMsgBox.setContentPane(waitMsg);
@@ -177,6 +177,21 @@ public class PlaceShips
       return(ships);
    }
    
+   private BufferedImage getImageFile(String filename)
+   {
+      try
+      {
+         return((BufferedImage)ImageIO.read(PlaceShips.class.getResourceAsStream(filename)));
+      }
+      catch(Exception e)
+      {
+         JOptionPane.showMessageDialog(null ,"Error loading image resource.", "Load Error", JOptionPane.ERROR_MESSAGE);          
+         System.exit(1);
+      }
+      
+      return(null);
+   }
+      
    private class GridMouser extends MouseAdapter
    {
       public void mouseClicked(MouseEvent e)
@@ -189,7 +204,7 @@ public class PlaceShips
          
          if(mode==0)
          {         
-            imgName.append("resources/" + shipSelected + "_");
+            imgName.append("/resources/" + shipSelected + "_");
                            
             if(clicked.getX()>=topLeftCorner.getX() && clicked.getY()>=topLeftCorner.getY())
             {
@@ -300,7 +315,7 @@ public class PlaceShips
          {
             BufferedImage shipImg;
             Point[] points= new Point[size];
-            BufferedImage bgImg= ImageIO.read(new File("resources/ocean.png"));
+            BufferedImage bgImg= getImageFile("/resources/ocean.png");
             BufferedImage combined;
             JLabel temp;
             int xPos= 0, yPos= 0;
@@ -311,7 +326,7 @@ public class PlaceShips
                if(tempPoint.getX()<(330-((size-1)*30)))
                {               
                   imgName.append("hor.png");
-                  shipImg= ImageIO.read(new File(imgName.toString()));
+                  shipImg= getImageFile(imgName.toString());
                
                   for(i=0;i<size;i++)
                   {
@@ -393,7 +408,7 @@ public class PlaceShips
          for(i=0;i<toErase.getSize();i++)
          {
             temp= (JLabel)theGrid.findComponentAt(toErase.getLocation(i));
-            temp.setIcon(new ImageIcon("resources/ocean.png"));
+            temp.setIcon(new ImageIcon(getImageFile("/resources/ocean.png")));
          }         
       } 
    }

@@ -101,23 +101,23 @@ public class BattleshipUI
       shipsRemainingLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
       shipsRemainingLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
                
-      battleship= new JLabel(new ImageIcon("resources/ba_ver.png"));
+      battleship= new JLabel(new ImageIcon(getImageFile("/resources/ba_ver.png")));
       battleship.setAlignmentX(Component.CENTER_ALIGNMENT);
       battleship.setAlignmentY(Component.CENTER_ALIGNMENT);
    
-      carrier= new JLabel(new ImageIcon("resources/ca_ver.png"));
+      carrier= new JLabel(new ImageIcon(getImageFile("/resources/ca_ver.png")));
       carrier.setAlignmentX(Component.CENTER_ALIGNMENT);
       carrier.setAlignmentY(Component.CENTER_ALIGNMENT);
    
-      cruiser= new JLabel(new ImageIcon("resources/cr_ver.png"));
+      cruiser= new JLabel(new ImageIcon(getImageFile("/resources/cr_ver.png")));
       cruiser.setAlignmentX(Component.CENTER_ALIGNMENT);
       cruiser.setAlignmentY(Component.CENTER_ALIGNMENT);
    
-      destroyer= new JLabel(new ImageIcon("resources/de_ver.png"));
+      destroyer= new JLabel(new ImageIcon(getImageFile("/resources/de_ver.png")));
       destroyer.setAlignmentX(Component.CENTER_ALIGNMENT);
       destroyer.setAlignmentY(Component.CENTER_ALIGNMENT);
    
-      submarine= new JLabel(new ImageIcon("resources/su_ver.png"));
+      submarine= new JLabel(new ImageIcon(getImageFile("/resources/su_ver.png")));
       submarine.setAlignmentX(Component.CENTER_ALIGNMENT);
       submarine.setAlignmentY(Component.CENTER_ALIGNMENT);
       
@@ -149,64 +149,57 @@ public class BattleshipUI
    
    private void placeYourShips(Ship[] yourShips)
    {
-      try
-      {
-         StringBuilder imgName= new StringBuilder("resources/");
-         BufferedImage shipImg;
-         BufferedImage bgImg= ImageIO.read(new File("resources/ocean.png"));
-         BufferedImage combinedImg= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
-         BufferedImage hitPegImg= ImageIO.read(new File("resources/hit_peg.png"));
-         BufferedImage disabledImg= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
-         JLabel temp;
-         Graphics g;
-         int xPos= 0, yPos= 0;
-         int i,j;
+      StringBuilder imgName= new StringBuilder("/resources/");
+      BufferedImage shipImg;
+      BufferedImage bgImg= getImageFile("/resources/ocean.png");
+      BufferedImage combinedImg= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
+      BufferedImage hitPegImg= getImageFile("/resources/hit_peg.png");
+      BufferedImage disabledImg= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
+      JLabel temp;
+      Graphics g;
+      int xPos= 0, yPos= 0;
+      int i,j;
       
-         for(i=0;i<yourShips.length;i++)
-         {
-            imgName.append(yourShips[i].getName() + "_");
-            if(yourShips[i].getOrientation()==0)
-               imgName.append("hor.png");
-            else
-               imgName.append("ver.png");
-               
-            shipImg= ImageIO.read(new File(imgName.toString()));
-         
-            for(j=0;j<yourShips[i].getSize();j++)
-            {
-               temp= (JLabel)yourGrid.findComponentAt(yourShips[i].getLocation(j));
-            
-               g= combinedImg.getGraphics();
-               
-               g.drawImage(bgImg,0,0,null);
-               g.drawImage(shipImg.getSubimage(xPos,yPos,30,30),0,0,null);
-                                    
-               temp.setIcon(new ImageIcon(combinedImg));
-            
-               g= disabledImg.getGraphics();
-            
-               g.drawImage(combinedImg,0,0,null);
-               g.drawImage(hitPegImg,0,0,null);
-            
-               temp.setDisabledIcon(new ImageIcon(disabledImg));
-            
-               if(yourShips[i].getOrientation()==0)
-                  xPos= xPos+30;
-               else
-                  yPos= yPos+30; 
-                  
-               combinedImg= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
-               disabledImg= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
-            }
-         
-            imgName= new StringBuilder("resources/");
-            xPos= 0;
-            yPos= 0;
-         }
-      }
-      catch(IOException e)
+      for(i=0;i<yourShips.length;i++)
       {
-         e.printStackTrace();
+         imgName.append(yourShips[i].getName() + "_");
+         if(yourShips[i].getOrientation()==0)
+            imgName.append("hor.png");
+         else
+            imgName.append("ver.png");
+               
+         shipImg= getImageFile(imgName.toString());
+         
+         for(j=0;j<yourShips[i].getSize();j++)
+         {
+            temp= (JLabel)yourGrid.findComponentAt(yourShips[i].getLocation(j));
+            
+            g= combinedImg.getGraphics();
+               
+            g.drawImage(bgImg,0,0,null);
+            g.drawImage(shipImg.getSubimage(xPos,yPos,30,30),0,0,null);
+                                    
+            temp.setIcon(new ImageIcon(combinedImg));
+            
+            g= disabledImg.getGraphics();
+            
+            g.drawImage(combinedImg,0,0,null);
+            g.drawImage(hitPegImg,0,0,null);
+            
+            temp.setDisabledIcon(new ImageIcon(disabledImg));
+            
+            if(yourShips[i].getOrientation()==0)
+               xPos= xPos+30;
+            else
+               yPos= yPos+30; 
+                  
+            combinedImg= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
+            disabledImg= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
+         }
+         
+         imgName= new StringBuilder("/resources/");
+         xPos= 0;
+         yPos= 0;
       }
    } 
       
@@ -227,7 +220,7 @@ public class BattleshipUI
          if(turnCounter==0)
          {
             waitDialog.close();
-            JOptionPane.showMessageDialog(theFrame, "Attack launched! Prepare for return fire!\nBattle stations! Battle stations!\nThis is not a drill!", "Attention Admiral!", JOptionPane.INFORMATION_MESSAGE, new ImageIcon("resources/alarm.png"));
+            JOptionPane.showMessageDialog(theFrame, "Attack launched! Prepare for return fire!\nBattle stations! Battle stations!\nThis is not a drill!", "Attention Admiral!", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(getImageFile("/resources/alarm.png")));
          }
          
          if(toProccess.getEndGame())
@@ -239,20 +232,15 @@ public class BattleshipUI
          
          if(toProccess.getIsHit())
          {
-            try
-            {
-               temp2= (ImageIcon)temp.getIcon();
-               BufferedImage a= ImageIO.read(new File(temp2.getDescription()));
-               BufferedImage b= ImageIO.read(new File("resources/hit_peg.png"));
-               BufferedImage combined= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
-               Graphics g= combined.getGraphics();
+            BufferedImage a= getImageFile("/resources/ocean.png");
+            BufferedImage b= getImageFile("/resources/hit_peg.png");
+            BufferedImage combined= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
+            Graphics g= combined.getGraphics();
                
-               g.drawImage(a,0,0,null);
-               g.drawImage(b,0,0,null);
+            g.drawImage(a,0,0,null);
+            g.drawImage(b,0,0,null);
                
-               temp.setDisabledIcon(new ImageIcon(combined));
-            }
-            catch(IOException e){}
+            temp.setDisabledIcon(new ImageIcon(combined));
             
             if(toProccess.getShipName().equals("ba"))
                message.append(" hits enemy battleship!");
@@ -274,7 +262,7 @@ public class BattleshipUI
       else
       {
          if(turnCounter==0)
-            JOptionPane.showMessageDialog(theFrame, "Enemy fleet activity detected!\nBattle stations! Battle stations!\nThis is not a drill!", "Attention Admiral!", JOptionPane.INFORMATION_MESSAGE, new ImageIcon("resources/alarm.png"));
+            JOptionPane.showMessageDialog(theFrame, "Enemy fleet activity detected!\nBattle stations! Battle stations!\nThis is not a drill!", "Attention Admiral!", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(getImageFile("/resources/alarm.png")));
          
          temp= (JLabel)yourGrid.findComponentAt(toProccess.getCoords());
          
@@ -335,8 +323,23 @@ public class BattleshipUI
       
       turnCounter++;
       turnNumLabel.setText("Turn: " + turnCounter);      
-   }     
+   } 
+   
+   private BufferedImage getImageFile(String filename)
+   {
+      try
+      {
+         return((BufferedImage)ImageIO.read(BattleshipUI.class.getResourceAsStream(filename)));
+      }
+      catch(Exception e)
+      {
+         JOptionPane.showMessageDialog(null ,"Error loading image resource.", "Load Error", JOptionPane.ERROR_MESSAGE);          
+         System.exit(1);
+      }
       
+      return(null);
+   }
+         
    private class MouseHandler extends MouseAdapter
    {
       public void mouseClicked(MouseEvent e)
@@ -365,7 +368,7 @@ public class BattleshipUI
       }
    }
    
-   public class WaitDialog extends JDialog
+   private class WaitDialog extends JDialog
    {
       private JDialog waitBox;
       private JPanel waitPanel;
@@ -378,7 +381,7 @@ public class BattleshipUI
          waitPanel= new JPanel();
          waitPanel.setLayout(new BoxLayout(waitPanel, BoxLayout.X_AXIS));
          waitPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-         waitIcon= new JLabel(new ImageIcon("resources/sonar.png"));
+         waitIcon= new JLabel(new ImageIcon(getImageFile("/resources/sonar.png")));
          waitPanel.add(waitIcon);
          waitPanel.add(Box.createRigidArea(new Dimension(5,0)));
          waitMsg= new JLabel("Targeting enemy fleet.");
@@ -398,7 +401,7 @@ public class BattleshipUI
       }
    }
       
-   public class ShipSunkDialog extends JDialog implements ActionListener
+   private class ShipSunkDialog extends JDialog implements ActionListener
    {
       private JDialog shipSunkBox;
       private JPanel shipSunkPanel;
@@ -418,7 +421,7 @@ public class BattleshipUI
          shipSunkMsgPanel= new JPanel();
          shipSunkMsgPanel.setLayout(new BoxLayout(shipSunkMsgPanel, BoxLayout.X_AXIS));
                   
-         shipSunkIcon= new JLabel(new ImageIcon("resources/sinking.png"));
+         shipSunkIcon= new JLabel(new ImageIcon(getImageFile("/resources/sinking.png")));
          shipSunkMsgPanel.add(shipSunkIcon);
       
          shipSunkMsgPanel.add(Box.createRigidArea(new Dimension(5,0)));
@@ -491,7 +494,7 @@ public class BattleshipUI
       }
    }
       
-   public class GameOverDialog extends JDialog implements ActionListener
+   private class GameOverDialog extends JDialog implements ActionListener
    {
       private JDialog gameOverBox;
       private JPanel gameOverPanel;
@@ -508,12 +511,12 @@ public class BattleshipUI
          
          if(win)
          {
-            gameOverIcon= new JLabel(new ImageIcon("resources/you_win.png"));
+            gameOverIcon= new JLabel(new ImageIcon(getImageFile("/resources/you_win.png")));
             gameOverMsg= new JLabel("Congratulations! Thanks for playing!");
          }
          else
          {
-            gameOverIcon= new JLabel(new ImageIcon("resources/you_lose.png"));
+            gameOverIcon= new JLabel(new ImageIcon(getImageFile("/resources/you_lose.png")));
             gameOverMsg= new JLabel("Better luck next time. Thanks for playing!");
          }   
                   

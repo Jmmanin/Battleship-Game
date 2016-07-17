@@ -9,6 +9,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 
 public class BattleshipClient
 {
@@ -28,7 +30,7 @@ public class BattleshipClient
    private JButton confirm;
    
    public BattleshipClient()
-   {
+   {      
       theFrame= new JFrame("Welcome to Battleship");
       theFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       theFrame.setResizable(false);
@@ -37,7 +39,7 @@ public class BattleshipClient
       logoPanel= new JPanel();
       logoPanel.setLayout(new FlowLayout());
       
-      logo= new JLabel(new ImageIcon("resources/battleship_logo.png"));
+      logo= new JLabel(new ImageIcon(getImageFile("/resources/battleship_logo.png")));
       logoPanel.add(logo);
       
       theFrame.add(logoPanel);
@@ -80,13 +82,28 @@ public class BattleshipClient
       confirm.addActionListener(new confirmListener());
       confirmPanel.add(confirm, BorderLayout.EAST);
       
-      theFrame.add(confirmPanel);      
+      theFrame.add(confirmPanel); 
             
       theFrame.pack();
       theFrame.setLocationRelativeTo(null);
       theFrame.setVisible(true);
    }
    
+   private BufferedImage getImageFile(String filename)
+   {
+      try
+      {
+         return((BufferedImage)ImageIO.read(BattleshipClient.class.getResourceAsStream(filename)));
+      }
+      catch(Exception e)
+      {
+         JOptionPane.showMessageDialog(null ,"Error loading image resource.", "Load Error", JOptionPane.ERROR_MESSAGE);          
+         System.exit(1);
+      } 
+      
+      return(null);     
+   }
+      
    private class confirmListener implements ActionListener
    {
       public void actionPerformed(ActionEvent e)

@@ -9,6 +9,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 
 public class BattleshipServer
 {
@@ -50,7 +52,7 @@ public class BattleshipServer
             
       leftPanel.add(Box.createRigidArea(new Dimension(0,5)));
       
-      logoLabel= new JLabel(new ImageIcon("resources/battleship_logo.png"));
+      logoLabel= new JLabel(new ImageIcon(getImageFile("/resources/battleship_logo.png")));
       logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
       leftPanel.add(logoLabel);
       
@@ -138,6 +140,18 @@ public class BattleshipServer
       theFrame.setVisible(true);      
    }
    
+   private BufferedImage getImageFile(String filename)
+   {
+      try
+      {
+         return((BufferedImage)ImageIO.read(getClass().getResourceAsStream(filename)));
+      }
+      catch(Exception e)
+      {
+         return(null);
+      }
+   }
+      
    private class StartButtonListener implements ActionListener
    {         
       public void actionPerformed(ActionEvent e)
@@ -295,7 +309,7 @@ public class BattleshipServer
                isP1Turn= !isP1Turn;
             }
             
-            console.append("Game has ended.\nPress stop button to close server.");
+            console.append("\nGame has ended.\nPress stop button to close server.");
             console.setCaretPosition(console.getDocument().getLength());
          }
          catch(IOException e)

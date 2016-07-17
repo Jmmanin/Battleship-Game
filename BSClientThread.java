@@ -7,6 +7,8 @@ Jeremy Manin
 import java.io.*;
 import java.net.*;
 import javax.swing.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 
 public class BSClientThread extends Thread
 {
@@ -158,7 +160,7 @@ public class BSClientThread extends Thread
       }
       catch(IOException e)
       {
-         JOptionPane.showMessageDialog(null ,"Error closing connection.", "Communication Error", JOptionPane.INFORMATION_MESSAGE);          
+         JOptionPane.showMessageDialog(null ,"Error closing connection.", "Communication Error", JOptionPane.ERROR_MESSAGE);          
       }
    }
 }

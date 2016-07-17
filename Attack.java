@@ -1,6 +1,6 @@
 /*
 Multiplayer Battleship Game
-Attack
+Attack Object
 Jeremy Manin
 */
 
