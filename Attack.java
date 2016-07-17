@@ -4,7 +4,7 @@ Attack
 Jeremy Manin
 */
 
-import java.awt.*;
+import java.awt.Point;
 import java.io.Serializable;
 
 public class Attack implements Serializable

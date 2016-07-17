@@ -219,6 +219,9 @@ public class BattleshipUI
       boolean endGame= true;
       StringBuilder message= new StringBuilder();
       
+      if(toProccess==null)
+         throw new NullPointerException();
+      
       if(clientThread.getIsTurn())
       {
          if(turnCounter==0)
@@ -538,9 +541,5 @@ public class BattleshipUI
          System.exit(0);
       }
    }
-   
-   /*public static void main(String args[])
-   {
-      new BattleshipUI(null);
-   }*/
+
 }

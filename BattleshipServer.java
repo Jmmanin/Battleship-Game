@@ -172,12 +172,12 @@ public class BattleshipServer
       
       public void run()
       {
+         boolean endGame= false;
+         boolean isP1Turn= true;
+         Attack fromClient= null;
+            
          try
          {            
-            boolean endGame= false;
-            boolean isP1Turn= true;
-            Attack fromClient= null;
-            
             serverSocket1= new ServerSocket(Integer.parseInt(port1Field.getText()));
             serverSocket2= new ServerSocket(Integer.parseInt(port2Field.getText()));
          
@@ -206,16 +206,24 @@ public class BattleshipServer
             p2Out= new ObjectOutputStream(p2Socket.getOutputStream());
             p2Out.flush();
             p2In= new ObjectInputStream(p2Socket.getInputStream());
-            
-            console.append("Both players have connected\n\nEntering main game.\n\n");
+         }
+         catch(IOException e)
+         {
+            console.append("\nConnection Error: " + e.toString());
             console.setCaretPosition(console.getDocument().getLength());
-                                    
+         }
+                     
+         console.append("Both players have connected\n\nEntering main game.\n");
+         console.setCaretPosition(console.getDocument().getLength());
+                     
+         try
+         {                           
             while(!endGame)
             {
                if(isP1Turn)
                {
                   fromClient= (Attack)p1In.readObject();
-                  console.append("P1 attacks " + fromClient.getCoordName() + ".\n");
+                  console.append("\nP1 attacks " + fromClient.getCoordName() + ".");
                   console.setCaretPosition(console.getDocument().getLength());
                   
                   p2Out.writeObject(fromClient);
@@ -224,22 +232,22 @@ public class BattleshipServer
                   fromClient= (Attack)p2In.readObject();
                   if(fromClient.getIsHit())
                   {
-                     console.append("P2 confirms " + fromClient.getCoordName() + " hits " + fromClient.getShipName() + ".\n");
+                     console.append("\nP2 confirms " + fromClient.getCoordName() + " hits " + fromClient.getShipName() + ".");
                      console.setCaretPosition(console.getDocument().getLength());
                   }
                   else
                   {
-                     console.append("P2 confirms " + fromClient.getCoordName() + " Miss.\n");
+                     console.append("\nP2 confirms " + fromClient.getCoordName() + " Miss.");
                      console.setCaretPosition(console.getDocument().getLength());
                   }
                   if(fromClient.getShipSunk())
                   {
-                     console.append("  P2 " + fromClient.getShipName() + " sunk.\n");
+                     console.append("\n  P2 " + fromClient.getShipName() + " sunk.");
                      console.setCaretPosition(console.getDocument().getLength());
                   }
                   if(fromClient.getEndGame())
                   {
-                     console.append("P1 Wins!\n");
+                     console.append("\n  P1 Wins!");
                      console.setCaretPosition(console.getDocument().getLength());
                   }
                   
@@ -249,7 +257,7 @@ public class BattleshipServer
                else
                {
                   fromClient= (Attack)p2In.readObject();
-                  console.append("P2 attacks " + fromClient.getCoordName() + ".\n");
+                  console.append("\nP2 attacks " + fromClient.getCoordName() + ".");
                   console.setCaretPosition(console.getDocument().getLength());
                   
                   p1Out.writeObject(fromClient);
@@ -258,22 +266,22 @@ public class BattleshipServer
                   fromClient= (Attack)p1In.readObject();
                   if(fromClient.getIsHit())
                   {
-                     console.append("P1 confirms " + fromClient.getCoordName() + " hits " + fromClient.getShipName() + ".\n");
+                     console.append("\nP1 confirms " + fromClient.getCoordName() + " hits " + fromClient.getShipName() + ".");
                      console.setCaretPosition(console.getDocument().getLength());
                   }
                   else
                   {
-                     console.append("P1 confirms " + fromClient.getCoordName() + " Miss.\n");
+                     console.append("\nP1 confirms " + fromClient.getCoordName() + " Miss.");
                      console.setCaretPosition(console.getDocument().getLength());
                   }
                   if(fromClient.getShipSunk())
                   {
-                     console.append("  P1 " + fromClient.getShipName() + " sunk.\n");
+                     console.append("\n  P1 " + fromClient.getShipName() + " sunk.");
                      console.setCaretPosition(console.getDocument().getLength());
                   }
                   if(fromClient.getEndGame())
                   {
-                     console.append("P2 Wins!\n");
+                     console.append("\n  P2 Wins!");
                      console.setCaretPosition(console.getDocument().getLength());
                   }
                   
@@ -292,12 +300,22 @@ public class BattleshipServer
          }
          catch(IOException e)
          {
-            console.append("\nError: " + e.getMessage());
+            console.append("\nCommunication Error: " + e.toString());
             console.setCaretPosition(console.getDocument().getLength());
+            try
+            {
+               p1Out.writeObject(null);
+            }
+            catch(IOException e2){}
+            try
+            {
+               p2Out.writeObject(null);
+            }
+            catch(IOException e2){}
          }
          catch(ClassNotFoundException e)
          {
-            console.append("\nError: " + e.getMessage());
+            console.append("\nCommunication Error: " + e.toString());
             console.setCaretPosition(console.getDocument().getLength());
          }
       }

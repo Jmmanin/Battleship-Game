@@ -28,13 +28,13 @@ public class BSClientThread extends Thread
    
    public void run()
    {         
-      try
-      {  
-         boolean isPlayer1;
-         Attack received;
+      boolean isPlayer1;
+      Attack received;
           
-         PlaceShips placeShips= new PlaceShips(this);
-              
+      PlaceShips placeShips= new PlaceShips(this);
+         
+      try
+      {     
          bsSocket= new Socket(hostName, portNumber1);
          in= new ObjectInputStream(bsSocket.getInputStream());
          out= new ObjectOutputStream(bsSocket.getOutputStream());
@@ -49,20 +49,41 @@ public class BSClientThread extends Thread
             in= new ObjectInputStream(bsSocket.getInputStream());
             out= new ObjectOutputStream(bsSocket.getOutputStream());
             out.flush();
-         
+            
             isTurn= false;
          }
-          
-         placeShips.closeWaitBox();
+      }
+      catch(UnknownHostException e)
+      {
+         JOptionPane.showMessageDialog(null ,"Could not connect to server.\nCheck hostname and port numbers and try again.", "Connection Error", JOptionPane.ERROR_MESSAGE);          
+         System.exit(1);
+      } 
+      catch(IOException e)
+      {
+         JOptionPane.showMessageDialog(null ,"Error communicating with server.\nCheck hostname and port numbers and try again.", "Communication Error", JOptionPane.ERROR_MESSAGE);          
+         System.exit(1);
+      }
+                
+      placeShips.closeWaitBox();
          
+      try
+      {
          synchronized(this)
          {
             while(!contToMain)
                this.wait();
          }
+      }
+      catch(InterruptedException e)
+      {
+         JOptionPane.showMessageDialog(null ,"Client thread was interrupted.", "Thread Interrupt Error", JOptionPane.ERROR_MESSAGE);          
+         System.exit(1);
+      }
                   
-         BattleshipUI mainGame= new BattleshipUI(placeShips.getShips(), this);
-                  
+      BattleshipUI mainGame= new BattleshipUI(placeShips.getShips(), this);
+           
+      try
+      {         
          while(!endGame)
          {
             if(isTurn)
@@ -86,25 +107,20 @@ public class BSClientThread extends Thread
          }
          
          bsSocket.close();
-      }
-      catch(UnknownHostException e)
-      {
-         JOptionPane.showMessageDialog(null ,"Could not connect to server.\nCheck hostname and port numbers and try again.", "Connection Error", JOptionPane.ERROR_MESSAGE);          
-         System.exit(1);
       } 
       catch(IOException e)
       {
          JOptionPane.showMessageDialog(null ,"Error communicating with server.\nCheck hostname and port numbers and try again.", "Communication Error", JOptionPane.ERROR_MESSAGE);          
          System.exit(1);
       }
-      catch(InterruptedException e)
-      {
-         JOptionPane.showMessageDialog(null ,"Client thread was interrupted.", "Thread Interrupted", JOptionPane.ERROR_MESSAGE);          
-         System.exit(1);
-      }
       catch(ClassNotFoundException e)
       {
          JOptionPane.showMessageDialog(null ,"Error reading attack.", "Read Error", JOptionPane.ERROR_MESSAGE);          
+         System.exit(1);
+      }
+      catch(NullPointerException e)
+      {
+         JOptionPane.showMessageDialog(null ,"Opponent has left game.", "Communication Error", JOptionPane.ERROR_MESSAGE);          
          System.exit(1);
       }
    }

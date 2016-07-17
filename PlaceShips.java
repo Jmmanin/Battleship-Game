@@ -20,6 +20,7 @@ public class PlaceShips
    private JPanel msgPanel;
    private JPanel buttonPanel;
    private JButton modeButton;
+   private JButton helpButton;
    private JButton doneButton;
    private JLabel battleship;
    private JLabel carrier;
@@ -73,18 +74,21 @@ public class PlaceShips
       theFrame.add(Box.createRigidArea(new Dimension(0,5)));
                   
       buttonPanel= new JPanel(new GridLayout(1,5));
-            
-      doneButton= new JButton("Done");
-      doneButton.addActionListener(new DoneButtonListener());
-      doneButton.setEnabled(false);
-            
+       
       mode= 0;      
       modeButton= new JButton("Mode");
       modeButton.addActionListener(new ModeButtonListener());
       
+      helpButton= new JButton("Help");
+      helpButton.addActionListener(new HelpButtonListener());
+            
+      doneButton= new JButton("Done");
+      doneButton.addActionListener(new DoneButtonListener());
+      doneButton.setEnabled(false);
+                 
       buttonPanel.add(new JLabel());
       buttonPanel.add(modeButton);
-      buttonPanel.add(new JLabel());
+      buttonPanel.add(helpButton);
       buttonPanel.add(doneButton);
       buttonPanel.add(new JLabel());
       
@@ -465,8 +469,16 @@ public class PlaceShips
             modeLabel.setText("Mode: Place");
          }
       }
-   } 
-      
+   }
+   
+   private class HelpButtonListener implements ActionListener
+   {
+      public void actionPerformed(ActionEvent e)
+      { 
+         new HelpDialog();
+      }
+   }
+            
    private class DoneButtonListener implements ActionListener
    {
       public void actionPerformed(ActionEvent e)
@@ -481,8 +493,95 @@ public class PlaceShips
       }
    }   
    
-   /*public static void main(String args[])
+   private class HelpDialog extends JDialog implements ActionListener
    {
-      new PlaceShips(null,0,0);
-   }*/
+      private JDialog helpBox;
+      private JPanel helpPanel;
+      private JLabel helpLabel1;
+      private JLabel helpLabel2;
+      private JLabel helpLabel3;
+      private JLabel helpLabel4;
+      private JLabel helpLabel5;
+      private JLabel helpLabel6;
+      private JLabel helpLabel7;
+      private JLabel helpLabel8;
+      private JLabel helpLabel9;
+      private JLabel helpLabel10;
+      private JLabel helpLabel11;
+      private JButton contButton;
+      
+      public HelpDialog()
+      {
+         helpBox= new JDialog(theFrame,"Help",false);
+         helpPanel= new JPanel();
+         helpPanel.setLayout(new BoxLayout(helpPanel, BoxLayout.Y_AXIS));
+         helpPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+         
+         helpLabel1= new JLabel("Instructions:");         
+         helpLabel1.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(helpLabel1);
+         
+         helpPanel.add(Box.createVerticalStrut(3));
+         
+         helpLabel2= new JLabel("Click a ship to select it.");         
+         helpLabel2.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(helpLabel2);
+
+         helpLabel3= new JLabel("Click the grid to place selected ship.");
+         helpLabel3.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(helpLabel3);
+
+         helpLabel4= new JLabel("Ship extends to the right/down");
+         helpLabel4.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(helpLabel4);
+         
+         helpLabel5= new JLabel("from where you clicked.");
+         helpLabel5.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(helpLabel5);
+
+         helpLabel6= new JLabel("Click \"Change Orientation\" to switch");         
+         helpLabel6.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(helpLabel6);
+         
+         helpLabel7= new JLabel("b/t horizontal and vertical placement.");         
+         helpLabel7.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(helpLabel7);
+
+         helpLabel8= new JLabel("Click \"Mode\" button to switch");         
+         helpLabel8.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(helpLabel8);
+         
+         helpLabel9= new JLabel("b/t place and erase modes.");
+         helpLabel9.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(helpLabel9);
+
+         helpLabel10= new JLabel("Click ship on grid to erase it.");         
+         helpLabel10.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(helpLabel10);
+         
+         helpLabel11= new JLabel("Click \"Done\" button to finalize fleet.");         
+         helpLabel11.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(helpLabel11);
+         
+         helpPanel.add(Box.createVerticalStrut(3));
+         
+         contButton= new JButton("Continue");
+         contButton.addActionListener(this);
+         contButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(contButton);
+         
+         helpBox.setContentPane(helpPanel);
+         helpBox.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+         helpBox.pack();
+         helpBox.setResizable(false);
+         helpBox.setLocationRelativeTo(theFrame);
+         helpBox.setVisible(true);
+      }
+         
+      public void actionPerformed(ActionEvent e)
+      {
+         helpBox.setVisible(false);
+         helpBox.dispose();
+      }   
+   }
 }
