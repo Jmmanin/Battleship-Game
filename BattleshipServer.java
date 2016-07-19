@@ -127,8 +127,8 @@ public class BattleshipServer
       
       console= new JTextArea(25,25);
       console.setEditable(false);
-      console.append("Welcome to the Battleship Multiplayer Server\n");
-      console.append("Press start to open server\n");
+      console.append("Welcome to the Battleship Multiplayer Server");
+      console.append("\nPress start to open server");
       
       scrollConsole= new JScrollPane(console);
       rightPanel.add(scrollConsole);
@@ -156,7 +156,7 @@ public class BattleshipServer
    {         
       public void actionPerformed(ActionEvent e)
       {
-         console.append("\nServer starting with ports " + port1Field.getText() + " and " + port2Field.getText() + ".\n");
+         console.append("\n\nServer starting with ports " + port1Field.getText() + " and " + port2Field.getText() + ".");
          
          serverThread= new ServerThread();
          serverThread.start();
@@ -186,48 +186,57 @@ public class BattleshipServer
       
       public void run()
       {
+         boolean connecting= true;
          boolean endGame= false;
          boolean isP1Turn= true;
          Attack fromClient= null;
-            
-         try
-         {            
-            serverSocket1= new ServerSocket(Integer.parseInt(port1Field.getText()));
-            serverSocket2= new ServerSocket(Integer.parseInt(port2Field.getText()));
-         
-            p1Socket= serverSocket1.accept();
-            console.append("\nPlayer 1 has connected: " + p1Socket.getInetAddress().toString() + "\n");
-            console.setCaretPosition(console.getDocument().getLength());
-            p2Socket= serverSocket1.accept();
-                  
-            p1Out= new ObjectOutputStream(p1Socket.getOutputStream());
-            p1Out.flush();
-            p1In= new ObjectInputStream(p1Socket.getInputStream());
-            
-            p2Out= new ObjectOutputStream(p2Socket.getOutputStream());
-            p2Out.flush();
-            
-            p1Out.writeBoolean(true);
-            p1Out.flush();      
-            p2Out.writeBoolean(false);
-            p2Out.flush();      
-         
-            p2Socket.close();
-            p2Socket= serverSocket2.accept();
-            console.append("Player 2 has connected: " + p2Socket.getInetAddress().toString() + "\n");
-            console.setCaretPosition(console.getDocument().getLength());
-         
-            p2Out= new ObjectOutputStream(p2Socket.getOutputStream());
-            p2Out.flush();
-            p2In= new ObjectInputStream(p2Socket.getInputStream());
-         }
-         catch(IOException e)
+          
+         while(connecting)
          {
-            console.append("\nConnection Error: " + e.toString());
-            console.setCaretPosition(console.getDocument().getLength());
+            try
+            {            
+               serverSocket1= new ServerSocket(Integer.parseInt(port1Field.getText()));
+               serverSocket2= new ServerSocket(Integer.parseInt(port2Field.getText()));
+            
+               p1Socket= serverSocket1.accept();
+               console.append("\n\nPlayer 1 has connected: " + p1Socket.getInetAddress().toString());
+               console.setCaretPosition(console.getDocument().getLength());
+               p2Socket= serverSocket1.accept();
+                  
+               p1Out= new ObjectOutputStream(p1Socket.getOutputStream());
+               p1Out.flush();
+               p1In= new ObjectInputStream(p1Socket.getInputStream());
+            
+               p2Out= new ObjectOutputStream(p2Socket.getOutputStream());
+               p2Out.flush();
+            
+               p1Out.writeBoolean(true);
+               p1Out.flush();      
+               p2Out.writeBoolean(false);
+               p2Out.flush();      
+            
+               p2Socket.close();
+               p2Socket= serverSocket2.accept();
+               console.append("\nPlayer 2 has connected: " + p2Socket.getInetAddress().toString());
+               console.setCaretPosition(console.getDocument().getLength());
+            
+               p2Out= new ObjectOutputStream(p2Socket.getOutputStream());
+               p2Out.flush();
+               p2In= new ObjectInputStream(p2Socket.getInputStream());
+               
+               connecting= false;
+            }
+            catch(IOException e)
+            {
+               console.append("\nConnection Error: " + e.toString());
+               console.append("\nPlayer 1 has aborted connection.");
+               console.append("\nRestarting connection process.");
+               console.setCaretPosition(console.getDocument().getLength());
+               closeConnection();
+            }
          }
                      
-         console.append("Both players have connected\n\nEntering main game.\n");
+         console.append("\nBoth players have connected\n\nEntering main game.\n");
          console.setCaretPosition(console.getDocument().getLength());
                      
          try
@@ -298,7 +307,6 @@ public class BattleshipServer
                      console.append("\n  P2 Wins!");
                      console.setCaretPosition(console.getDocument().getLength());
                   }
-                  
                   
                   p2Out.writeObject(fromClient);
                   p2Out.flush();

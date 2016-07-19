@@ -32,9 +32,8 @@ public class PlaceShips
    private JLabel modeLabel;
    private JLabel orientLabel;
    
-   private JDialog waitMsgBox;
-   private JLabel waitMsg;
-   
+   private WaitDialog waitDialog;
+      
    private int mode;
    private int shipOrientation;
    private String shipSelected;
@@ -143,14 +142,7 @@ public class PlaceShips
       theFrame.pack();
       theFrame.setLocationRelativeTo(null);
       
-      waitMsgBox= new JDialog(theFrame,"Waiting",false); //make class
-      waitMsg= new JLabel("Waiting for other player to join.");
-      waitMsg.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-      waitMsgBox.setContentPane(waitMsg);
-      waitMsgBox.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-      waitMsgBox.pack();
-      waitMsgBox.setLocationRelativeTo(null);
-      waitMsgBox.setVisible(true);
+      waitDialog= new WaitDialog();
       
       shipSelected= null;
       baPlaced= false;
@@ -165,13 +157,12 @@ public class PlaceShips
       clientThread= cT;      
    }
    
-   public void closeWaitBox()
+   public void start()
    {
-      waitMsgBox.setVisible(false);
-      waitMsgBox.dispose();      
-      theFrame.setVisible(true);
+      waitDialog.close();
+      theFrame.setVisible(true);   
    }
-   
+      
    public Ship[] getShips()
    {
       return(ships);
@@ -311,107 +302,101 @@ public class PlaceShips
       
       private boolean placeShip(StringBuilder imgName, Point tempPoint, int orientation, int size)
       {
-         try
-         {
-            BufferedImage shipImg;
-            Point[] points= new Point[size];
-            BufferedImage bgImg= getImageFile("/resources/ocean.png");
-            BufferedImage combined;
-            JLabel temp;
-            int xPos= 0, yPos= 0;
-            int i;
+         BufferedImage shipImg;
+         Point[] points= new Point[size];
+         BufferedImage bgImg= getImageFile("/resources/ocean.png");
+         BufferedImage combined;
+         JLabel temp;
+         int xPos= 0, yPos= 0;
+         int i;
          
-            if(orientation==0)
-            {
-               if(tempPoint.getX()<(330-((size-1)*30)))
-               {               
-                  imgName.append("hor.png");
-                  shipImg= getImageFile(imgName.toString());
+         if(orientation==0)
+         {
+            if(tempPoint.getX()<(330-((size-1)*30)))
+            {               
+               imgName.append("hor.png");
+               shipImg= getImageFile(imgName.toString());
                
-                  for(i=0;i<size;i++)
-                  {
-                     points[i]= new Point(tempPoint);
-                     tempPoint.setLocation(tempPoint.getX()+30,tempPoint.getY());   
-                  }
-               }
-               else
+               for(i=0;i<size;i++)
                {
-                  msgLabel.setText("Too close to edge");
-                  return(false);
-               }     
+                  points[i]= new Point(tempPoint);
+                  tempPoint.setLocation(tempPoint.getX()+30,tempPoint.getY());   
+               }
             }
             else
             {
-               if(tempPoint.getY()<(330-((size-1)*30)))
-               {
-                  imgName.append("ver.png");
-                  shipImg= ImageIO.read(new File(imgName.toString()));
+               msgLabel.setText("Too close to edge");
+               return(false);
+            }     
+         }
+         else
+         {
+            if(tempPoint.getY()<(330-((size-1)*30)))
+            {
+               imgName.append("ver.png");
+               shipImg= getImageFile(imgName.toString());
                
-                  for(i=0;i<size;i++)
-                  {
-                     points[i]= new Point(tempPoint);
-                     tempPoint.setLocation(tempPoint.getX(),tempPoint.getY()+30);   
-                  }
-               }
-               else
+               for(i=0;i<size;i++)
                {
-                  msgLabel.setText("Too close to edge");
+                  points[i]= new Point(tempPoint);
+                  tempPoint.setLocation(tempPoint.getX(),tempPoint.getY()+30);   
+               }
+            }
+            else
+            {
+               msgLabel.setText("Too close to edge");
+               return(false);
+            }
+         }
+         
+         ships[shipsAdded]= new Ship(shipSelected,size,shipOrientation,points);
+         
+         if(shipsAdded>0)
+         {
+            for(i=0;i<shipsAdded;i++)
+            {
+               if(ships[shipsAdded].getTotalSpaceOccupied().intersects(ships[i].getTotalSpaceOccupied()))
+               {
+                  msgLabel.setText("Intersects other ship"); 
                   return(false);
                }
             }
-         
-            ships[shipsAdded]= new Ship(shipSelected,size,shipOrientation,points);
-         
-            if(shipsAdded>0)
-            {
-               for(i=0;i<shipsAdded;i++)
-               {
-                  if(ships[shipsAdded].getTotalSpaceOccupied().intersects(ships[i].getTotalSpaceOccupied()))
-                  {
-                     msgLabel.setText("Intersects other ship"); 
-                     return(false);
-                  }
-               }
-            }
-                
-            for(i=0;i<ships[shipsAdded].getSize();i++)
-            {
-               temp= (JLabel)theGrid.findComponentAt(ships[shipsAdded].getLocation(i));
-            
-               combined= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
-               Graphics g= combined.getGraphics();
-               
-               g.drawImage(bgImg,0,0,null);
-               g.drawImage(shipImg.getSubimage(xPos,yPos,30,30),0,0,null);
-                                    
-               temp.setIcon(new ImageIcon(combined));
-            
-               if(shipOrientation==0)
-                  xPos= xPos+30;
-               else
-                  yPos= yPos+30;   
-            }
-         
-            shipsAdded++;
-            return(true);
          }
-         catch(IOException e){}
-         
-         return(false);
-      }
-      
-      private void eraseShip(Ship toErase)
-      {
-         JLabel temp;
-         int i;
-         
-         for(i=0;i<toErase.getSize();i++)
+                
+         for(i=0;i<ships[shipsAdded].getSize();i++)
          {
-            temp= (JLabel)theGrid.findComponentAt(toErase.getLocation(i));
-            temp.setIcon(new ImageIcon(getImageFile("/resources/ocean.png")));
-         }         
-      } 
+            temp= (JLabel)theGrid.findComponentAt(ships[shipsAdded].getLocation(i));
+            
+            combined= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
+            Graphics g= combined.getGraphics();
+               
+            g.drawImage(bgImg,0,0,null);
+            g.drawImage(shipImg.getSubimage(xPos,yPos,30,30),0,0,null);
+                                    
+            temp.setIcon(new ImageIcon(combined));
+            
+            if(shipOrientation==0)
+               xPos= xPos+30;
+            else
+               yPos= yPos+30;   
+         }
+         
+         shipsAdded++;
+         return(true);
+      }         
    }
+      
+   private void eraseShip(Ship toErase)
+   {
+      JLabel temp;
+      int i;
+         
+      for(i=0;i<toErase.getSize();i++)
+      {
+         temp= (JLabel)theGrid.findComponentAt(toErase.getLocation(i));
+         temp.setIcon(new ImageIcon(getImageFile("/resources/ocean.png")));
+      }         
+   } 
    
    private class ShipMouser extends MouseAdapter
    {
@@ -506,7 +491,50 @@ public class PlaceShips
             clientThread.notifyAll();
          }
       }
-   }   
+   } 
+   
+   private class WaitDialog extends JDialog implements ActionListener
+   {
+      private JDialog waitBox;
+      private JPanel waitPanel;
+      private JLabel waitMsg;
+      private JButton cancelButton;
+   
+      public WaitDialog()
+      {
+         waitBox= new JDialog(theFrame,"Waiting",false);
+         waitBox.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+
+         waitPanel= new JPanel();
+         waitPanel.setLayout(new BoxLayout(waitPanel, BoxLayout.Y_AXIS));
+         waitPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+         
+         waitMsg= new JLabel("Waiting for other player to join.");
+         waitMsg.setAlignmentX(Component.CENTER_ALIGNMENT);
+         waitPanel.add(waitMsg);
+         
+         cancelButton= new JButton("Cancel");
+         cancelButton.addActionListener(this);
+         cancelButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+         waitPanel.add(cancelButton);
+         
+         waitBox.setContentPane(waitPanel);
+         waitBox.pack();
+         waitBox.setLocationRelativeTo(null);
+         waitBox.setVisible(true);
+      }
+   
+      public void actionPerformed(ActionEvent e)
+      {
+         System.exit(0);
+      }
+      
+      public void close()
+      {
+         waitBox.setVisible(false);
+         waitBox.dispose();
+      }
+   }  
    
    private class HelpDialog extends JDialog implements ActionListener
    {
@@ -541,11 +569,11 @@ public class PlaceShips
          helpLabel2= new JLabel("Click a ship to select it.");         
          helpLabel2.setAlignmentX(Component.CENTER_ALIGNMENT);
          helpPanel.add(helpLabel2);
-
+      
          helpLabel3= new JLabel("Click the grid to place selected ship.");
          helpLabel3.setAlignmentX(Component.CENTER_ALIGNMENT);
          helpPanel.add(helpLabel3);
-
+      
          helpLabel4= new JLabel("Ship extends to the right/down");
          helpLabel4.setAlignmentX(Component.CENTER_ALIGNMENT);
          helpPanel.add(helpLabel4);
@@ -553,7 +581,7 @@ public class PlaceShips
          helpLabel5= new JLabel("from where you clicked.");
          helpLabel5.setAlignmentX(Component.CENTER_ALIGNMENT);
          helpPanel.add(helpLabel5);
-
+      
          helpLabel6= new JLabel("Click \"Change Orientation\" to switch");         
          helpLabel6.setAlignmentX(Component.CENTER_ALIGNMENT);
          helpPanel.add(helpLabel6);
@@ -561,7 +589,7 @@ public class PlaceShips
          helpLabel7= new JLabel("b/t horizontal and vertical placement.");         
          helpLabel7.setAlignmentX(Component.CENTER_ALIGNMENT);
          helpPanel.add(helpLabel7);
-
+      
          helpLabel8= new JLabel("Click \"Mode\" button to switch");         
          helpLabel8.setAlignmentX(Component.CENTER_ALIGNMENT);
          helpPanel.add(helpLabel8);
@@ -569,7 +597,7 @@ public class PlaceShips
          helpLabel9= new JLabel("b/t place and erase modes.");
          helpLabel9.setAlignmentX(Component.CENTER_ALIGNMENT);
          helpPanel.add(helpLabel9);
-
+      
          helpLabel10= new JLabel("Click ship on grid to erase it.");         
          helpLabel10.setAlignmentX(Component.CENTER_ALIGNMENT);
          helpPanel.add(helpLabel10);

@@ -30,43 +30,53 @@ public class BSClientThread extends Thread
    
    public void run()
    {         
+      boolean connecting= true;
       boolean isPlayer1;
-      Attack received;
+      Attack received= null;
+      Attack processed= null;
           
       PlaceShips placeShips= new PlaceShips(this);
-         
-      try
-      {     
-         bsSocket= new Socket(hostName, portNumber1);
-         in= new ObjectInputStream(bsSocket.getInputStream());
-         out= new ObjectOutputStream(bsSocket.getOutputStream());
-         out.flush();
-                  
-         isPlayer1= in.readBoolean();
-               
-         if(!isPlayer1)
-         {
-            bsSocket.close();
-            bsSocket= new Socket(hostName, portNumber2);
+      
+      while(connecting)
+      {   
+         try
+         {     
+            bsSocket= new Socket(hostName, portNumber1);
             in= new ObjectInputStream(bsSocket.getInputStream());
             out= new ObjectOutputStream(bsSocket.getOutputStream());
             out.flush();
-            
-            isTurn= false;
+                  
+            isPlayer1= in.readBoolean();
+               
+            if(!isPlayer1)
+            {
+               bsSocket.close();
+               bsSocket= new Socket(hostName, portNumber2);
+               in= new ObjectInputStream(bsSocket.getInputStream());
+               out= new ObjectOutputStream(bsSocket.getOutputStream());
+               out.flush();
+               
+               isTurn= false;
+            }
+               
+            connecting= false;
          }
-      }
-      catch(UnknownHostException e)
-      {
-         JOptionPane.showMessageDialog(null ,"Could not connect to server.\nCheck hostname and port numbers and try again.", "Connection Error", JOptionPane.ERROR_MESSAGE);          
-         System.exit(1);
-      } 
-      catch(IOException e)
-      {
-         JOptionPane.showMessageDialog(null ,"Error communicating with server.\nCheck hostname and port numbers and try again.", "Communication Error", JOptionPane.ERROR_MESSAGE);          
-         System.exit(1);
+         catch(UnknownHostException e)
+         {
+            JOptionPane.showMessageDialog(null ,"Could not connect to server.\nCheck hostname and port numbers and try again.", "Connection Error", JOptionPane.ERROR_MESSAGE);          
+            System.exit(1);
+         }
+         catch(IOException e)
+         {
+            try
+            {
+               bsSocket.close();
+            }
+            catch(IOException e2){}            
+         } 
       }
                 
-      placeShips.closeWaitBox();
+      placeShips.start();
          
       try
       {
@@ -91,13 +101,13 @@ public class BSClientThread extends Thread
             if(isTurn)
             {
                received= (Attack)in.readObject();
-               mainGame.proccessAttack(received); 
+               mainGame.processAttack(received); 
             }
             else
             {
                received= (Attack)in.readObject();
-               received= mainGame.proccessAttack(received);
-               sendAttack(received);
+               processed= mainGame.processAttack(received);
+               sendAttack(processed);
             }
          
             endGame= received.getEndGame();
@@ -105,7 +115,10 @@ public class BSClientThread extends Thread
             out.flush();
             
             isTurn= !isTurn;
-            mainGame.updateTurnLabels(isTurn);            
+            mainGame.updateTurnLabels(isTurn);
+            
+            received= null;
+            processed= null;            
          }
          
          bsSocket.close();

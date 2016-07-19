@@ -203,7 +203,7 @@ public class BattleshipUI
       }
    } 
       
-   public Attack proccessAttack(Attack toProccess)
+   public Attack processAttack(Attack toProccess)
    {      
       JLabel temp= null;
       ImageIcon temp2;
@@ -346,8 +346,9 @@ public class BattleshipUI
       {
          int xPos= e.getX();
          int yPos= e.getY();
+         JLabel temp= (JLabel)enemyGrid.findComponentAt(xPos,yPos);
          
-         if(xPos>=30 && yPos>=30 && clientThread.getIsTurn())
+         if(xPos>=30 && yPos>=30 && clientThread.getIsTurn() && temp.isEnabled())
          {
             Point clicked;
             char yGrid= 64;
