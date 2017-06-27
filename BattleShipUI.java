@@ -371,14 +371,13 @@ public class BattleshipUI
    
    private class WaitDialog extends JDialog
    {
-      private JDialog waitBox;
       private JPanel waitPanel;
       private JLabel waitIcon;
       private JLabel waitMsg;
       
       public WaitDialog()
       {
-         waitBox= new JDialog(theFrame,"Targeting",false);
+         super(theFrame,"Targeting",false);
          waitPanel= new JPanel();
          waitPanel.setLayout(new BoxLayout(waitPanel, BoxLayout.X_AXIS));
          waitPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -387,24 +386,23 @@ public class BattleshipUI
          waitPanel.add(Box.createRigidArea(new Dimension(5,0)));
          waitMsg= new JLabel("Targeting enemy fleet.");
          waitPanel.add(waitMsg);
-         waitBox.setContentPane(waitPanel);
-         waitBox.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-         waitBox.pack();
-         waitBox.setResizable(false);
-         waitBox.setLocationRelativeTo(theFrame);
-         waitBox.setVisible(true);
+         this.setContentPane(waitPanel);
+         this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+         this.pack();
+         this.setResizable(false);
+         this.setLocationRelativeTo(theFrame);
+         this.setVisible(true);
       }
       
       public void close()
       {
-         waitBox.setVisible(false);
-         waitBox.dispose();
+         this.setVisible(false);
+         this.dispose();
       }
    }
       
    private class ShipSunkDialog extends JDialog implements ActionListener
    {
-      private JDialog shipSunkBox;
       private JPanel shipSunkPanel;
       private JPanel shipSunkMsgPanel;
       private JPanel shipSunkButtonPanel;
@@ -414,7 +412,7 @@ public class BattleshipUI
       
       public ShipSunkDialog(boolean turn, String shipName)
       {
-         shipSunkBox= new JDialog(theFrame,"Attention Admiral!",false);
+         super(theFrame,"Attention Admiral!",false);
          shipSunkPanel= new JPanel();
          shipSunkPanel.setLayout(new BoxLayout(shipSunkPanel, BoxLayout.Y_AXIS));
          shipSunkPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -480,24 +478,23 @@ public class BattleshipUI
          
          shipSunkPanel.add(shipSunkButtonPanel);
          
-         shipSunkBox.setContentPane(shipSunkPanel);
-         shipSunkBox.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-         shipSunkBox.pack();
-         shipSunkBox.setResizable(false);
-         shipSunkBox.setLocationRelativeTo(theFrame);
-         shipSunkBox.setVisible(true);
+         this.setContentPane(shipSunkPanel);
+         this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+         this.pack();
+         this.setResizable(false);
+         this.setLocationRelativeTo(theFrame);
+         this.setVisible(true);
       }
       
       public void actionPerformed(ActionEvent e)
       {
-         shipSunkBox.setVisible(false);
-         shipSunkBox.dispose();
+         this.setVisible(false);
+         this.dispose();
       }
    }
       
    private class GameOverDialog extends JDialog implements ActionListener
    {
-      private JDialog gameOverBox;
       private JPanel gameOverPanel;
       private JLabel gameOverIcon;
       private JLabel gameOverMsg;
@@ -505,7 +502,7 @@ public class BattleshipUI
          
       public GameOverDialog(boolean win)
       {
-         gameOverBox= new JDialog(theFrame,"Game Over",false);
+         super(theFrame,"Game Over",false);
          gameOverPanel= new JPanel();
          gameOverPanel.setLayout(new BoxLayout(gameOverPanel, BoxLayout.Y_AXIS));
          gameOverPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -532,12 +529,12 @@ public class BattleshipUI
          gameOverButton.setAlignmentX(Component.CENTER_ALIGNMENT);
          gameOverPanel.add(gameOverButton);
          
-         gameOverBox.setContentPane(gameOverPanel);
-         gameOverBox.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-         gameOverBox.pack();
-         gameOverBox.setResizable(false);
-         gameOverBox.setLocationRelativeTo(theFrame);
-         gameOverBox.setVisible(true);
+         this.setContentPane(gameOverPanel);
+         this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+         this.pack();
+         this.setResizable(false);
+         this.setLocationRelativeTo(theFrame);
+         this.setVisible(true);
       }
          
       public void actionPerformed(ActionEvent e)

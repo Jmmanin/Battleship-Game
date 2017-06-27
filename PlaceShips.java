@@ -74,15 +74,20 @@ public class PlaceShips
                   
       buttonPanel= new JPanel(new GridLayout(1,5));
        
+      PlaceShipsListener placeShipsListener= new PlaceShipsListener(); 
+       
       mode= 0;      
       modeButton= new JButton("Mode");
-      modeButton.addActionListener(new ModeButtonListener());
+      modeButton.addActionListener(placeShipsListener);
+      modeButton.setActionCommand("mode");
       
       helpButton= new JButton("Help");
-      helpButton.addActionListener(new HelpButtonListener());
+      helpButton.addActionListener(placeShipsListener);
+      helpButton.setActionCommand("help");
             
       doneButton= new JButton("Done");
-      doneButton.addActionListener(new DoneButtonListener());
+      doneButton.addActionListener(placeShipsListener);
+      doneButton.setActionCommand("done");
       doneButton.setEnabled(false);
                  
       buttonPanel.add(new JLabel());
@@ -123,7 +128,8 @@ public class PlaceShips
    
       shipOrientation= 0;
       orientation= new JButton("Change Orientation");
-      orientation.addActionListener(new OrientationButtonListener());
+      orientation.addActionListener(placeShipsListener);
+      orientation.setActionCommand("orientation");
       
       shipPanel.add(battleship);
       shipPanel.add(carrier);
@@ -437,74 +443,64 @@ public class PlaceShips
       }
    }
    
-   private class OrientationButtonListener implements ActionListener
+   private class PlaceShipsListener implements ActionListener
    {
       public void actionPerformed(ActionEvent e)
       {
-         if(shipOrientation==0)
+         if(e.getActionCommand().equals("orientation"))
          {
-            orientLabel.setText("Orientation: Veritcal");
-            shipOrientation= 1;
-         }   
-         else
-         {
-            orientLabel.setText("Orientation: Horizontal");
-            shipOrientation= 0;
-         }     
-      }
-   }
-   
-   private class ModeButtonListener implements ActionListener
-   {
-      public void actionPerformed(ActionEvent e)
-      {
-         if(mode==0)
-         {
-            mode= 1;
-            modeLabel.setText("Mode: Erase");
+            if(shipOrientation==0)
+            {
+               orientLabel.setText("Orientation: Veritcal");
+               shipOrientation= 1;
+            }   
+            else
+            {
+               orientLabel.setText("Orientation: Horizontal");
+               shipOrientation= 0;
+            }     
          }
-         else
+         else if(e.getActionCommand().equals("mode"))
          {
-            mode= 0;
-            modeLabel.setText("Mode: Place");
+            if(mode==0)
+            {
+               mode= 1;
+               modeLabel.setText("Mode: Erase");
+            }
+            else
+            {
+               mode= 0;
+               modeLabel.setText("Mode: Place");
+            }
          }
-      }
-   }
-   
-   private class HelpButtonListener implements ActionListener
-   {
-      public void actionPerformed(ActionEvent e)
-      { 
-         new HelpDialog();
-      }
-   }
-            
-   private class DoneButtonListener implements ActionListener
-   {
-      public void actionPerformed(ActionEvent e)
-      {               
-         theFrame.setVisible(false);
-         theFrame.dispose();   
-         clientThread.setContToMain(true);
-         synchronized(clientThread)
+         else if(e.getActionCommand().equals("help"))
          {
-            clientThread.notifyAll();
+            new HelpDialog();
+         }
+         else if(e.getActionCommand().equals("done"))
+         {
+            theFrame.setVisible(false);
+            theFrame.dispose();   
+            clientThread.setContToMain(true);
+            synchronized(clientThread)
+            {
+               clientThread.notifyAll();
+            }
          }
       }
-   } 
+   }
    
    private class WaitDialog extends JDialog implements ActionListener
    {
-      private JDialog waitBox;
       private JPanel waitPanel;
       private JLabel waitMsg;
       private JButton cancelButton;
    
       public WaitDialog()
       {
-         waitBox= new JDialog(theFrame,"Waiting",false);
-         waitBox.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-
+         super(theFrame,"Waiting",false);
+         this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+      
          waitPanel= new JPanel();
          waitPanel.setLayout(new BoxLayout(waitPanel, BoxLayout.Y_AXIS));
          waitPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -518,10 +514,10 @@ public class PlaceShips
          cancelButton.setAlignmentX(Component.CENTER_ALIGNMENT);
          waitPanel.add(cancelButton);
          
-         waitBox.setContentPane(waitPanel);
-         waitBox.pack();
-         waitBox.setLocationRelativeTo(null);
-         waitBox.setVisible(true);
+         this.setContentPane(waitPanel);
+         this.pack();
+         this.setLocationRelativeTo(null);
+         this.setVisible(true);
       }
    
       public void actionPerformed(ActionEvent e)
@@ -531,14 +527,13 @@ public class PlaceShips
       
       public void close()
       {
-         waitBox.setVisible(false);
-         waitBox.dispose();
+         this.setVisible(false);
+         this.dispose();
       }
    }  
    
    private class HelpDialog extends JDialog implements ActionListener
    {
-      private JDialog helpBox;
       private JPanel helpPanel;
       private JLabel helpLabel1;
       private JLabel helpLabel2;
@@ -555,7 +550,7 @@ public class PlaceShips
       
       public HelpDialog()
       {
-         helpBox= new JDialog(theFrame,"Help",false);
+         super(theFrame,"Help",false);
          helpPanel= new JPanel();
          helpPanel.setLayout(new BoxLayout(helpPanel, BoxLayout.Y_AXIS));
          helpPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -613,18 +608,18 @@ public class PlaceShips
          contButton.setAlignmentX(Component.CENTER_ALIGNMENT);
          helpPanel.add(contButton);
          
-         helpBox.setContentPane(helpPanel);
-         helpBox.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-         helpBox.pack();
-         helpBox.setResizable(false);
-         helpBox.setLocationRelativeTo(theFrame);
-         helpBox.setVisible(true);
+         this.setContentPane(helpPanel);
+         this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+         this.pack();
+         this.setResizable(false);
+         this.setLocationRelativeTo(theFrame);
+         this.setVisible(true);
       }
          
       public void actionPerformed(ActionEvent e)
       {
-         helpBox.setVisible(false);
-         helpBox.dispose();
+         this.setVisible(false);
+         this.dispose();
       }   
    }
 }

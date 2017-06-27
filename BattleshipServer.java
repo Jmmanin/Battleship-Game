@@ -25,7 +25,6 @@ public class BattleshipServer
    private JLabel infoLabel;
    private JLabel infoLabel2;
    private JLabel infoLabel3;
-   private JLabel infoLabel4;
    private JLabel port1Label;
    private JTextField port1Field;
    private JLabel port2Label;
@@ -77,11 +76,7 @@ public class BattleshipServer
       infoLabel3= new JLabel("Click stop to close server.");
       infoLabel3.setAlignmentX(Component.CENTER_ALIGNMENT);
       leftPanel.add(infoLabel3);
-      
-      infoLabel4= new JLabel("**This program does not map ports**");
-      infoLabel4.setAlignmentX(Component.CENTER_ALIGNMENT);
-      leftPanel.add(infoLabel4);
-            
+                  
       portPanel= new JPanel();
       portPanel.setLayout(new FlowLayout());
       portPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
@@ -104,14 +99,18 @@ public class BattleshipServer
       buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
       buttonPanel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
       
+      ServerListener serverListener= new ServerListener();
+      
       startButton= new JButton("Start");
-      startButton.addActionListener(new StartButtonListener());
+      startButton.addActionListener(serverListener);
+      startButton.setActionCommand("start");
       buttonPanel.add(startButton);
       
       buttonPanel.add(Box.createRigidArea(new Dimension(40,0)));
       
       stopButton= new JButton("Stop");
-      stopButton.addActionListener(new StopButtonListener());
+      stopButton.addActionListener(serverListener);
+      stopButton.setActionCommand("stop");
       stopButton.setEnabled(false);
       buttonPanel.add(stopButton);
       
@@ -151,32 +150,31 @@ public class BattleshipServer
          return(null);
       }
    }
-      
-   private class StartButtonListener implements ActionListener
-   {         
-      public void actionPerformed(ActionEvent e)
-      {
-         console.append("\n\nServer starting with ports " + port1Field.getText() + " and " + port2Field.getText() + ".");
-         
-         serverThread= new ServerThread();
-         serverThread.start();
-         
-         port1Field.setEnabled(false);
-         port2Field.setEnabled(false);
-         startButton.setEnabled(false);
-         stopButton.setEnabled(true);
-      }
-   }   
-
-   private class StopButtonListener implements ActionListener
+   
+   private class ServerListener implements ActionListener
    {
       public void actionPerformed(ActionEvent e)
       {
-         serverThread.closeConnection();
-         System.exit(0);
+         if(e.getActionCommand().equals("start"))
+         {
+            console.append("\n\nServer starting with ports " + port1Field.getText() + " and " + port2Field.getText() + ".");
+         
+            serverThread= new ServerThread();
+            serverThread.start();
+         
+            port1Field.setEnabled(false);
+            port2Field.setEnabled(false);
+            startButton.setEnabled(false);
+            stopButton.setEnabled(true);
+         }
+         else if(e.getActionCommand().equals("stop"))
+         {
+            serverThread.closeConnection();
+            System.exit(0);
+         }
       }
    }
-   
+         
    private class ServerThread extends Thread
    {
       private ServerSocket serverSocket1, serverSocket2;
