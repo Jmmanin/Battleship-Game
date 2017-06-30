@@ -36,7 +36,7 @@ public class BattleshipClient
       theFrame.setResizable(false);
       theFrame.getContentPane().setLayout(new BoxLayout(theFrame.getContentPane(), BoxLayout.Y_AXIS));
       
-      logoPanel= new JPanel();
+      logoPanel= new JPanel(); //splash logo
       logoPanel.setLayout(new FlowLayout());
       
       logo= new JLabel(new ImageIcon(getImageFile("/resources/battleship_logo.png")));
@@ -44,7 +44,7 @@ public class BattleshipClient
       
       theFrame.add(logoPanel);
       
-      hostPanel= new JPanel();
+      hostPanel= new JPanel(); //host name
       hostPanel.setLayout(new FlowLayout());
       
       hostLabel= new JLabel("Host Name:");
@@ -55,24 +55,24 @@ public class BattleshipClient
       
       theFrame.add(hostPanel);
       
-      portPanel= new JPanel();
+      portPanel= new JPanel(); //ports
       portPanel.setLayout(new FlowLayout());
       
       port1Label= new JLabel("Port 1:");
       portPanel.add(port1Label);
       
-      port1Field= new JTextField("4444");
+      port1Field= new JTextField("4444"); //default port 1
       portPanel.add(port1Field);
       
       port2Label= new JLabel("Port 2:");
       portPanel.add(port2Label);
       
-      port2Field= new JTextField("4443");
+      port2Field= new JTextField("4443"); //default port 2
       portPanel.add(port2Field);
       
       theFrame.add(portPanel);
       
-      confirmPanel= new JPanel();
+      confirmPanel= new JPanel(); //credits and start button
       confirmPanel.setLayout(new BorderLayout());
        
       aboutLabel= new JLabel(" By: Jeremy Manin, ©Hasbro");
@@ -89,7 +89,7 @@ public class BattleshipClient
       theFrame.setVisible(true);
    }
    
-   private BufferedImage getImageFile(String filename)
+   private BufferedImage getImageFile(String filename) //JAR-friendly method to load image files
    {
       try
       {
@@ -106,7 +106,7 @@ public class BattleshipClient
       
    private class confirmListener implements ActionListener
    {
-      public void actionPerformed(ActionEvent e)
+      public void actionPerformed(ActionEvent e) //starts server
       {
          BSClientThread theThread= new BSClientThread(hostField.getText(), Integer.parseInt(port1Field.getText()), Integer.parseInt(port2Field.getText()));
          theThread.start();

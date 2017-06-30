@@ -35,38 +35,38 @@ public class BSClientThread extends Thread
       Attack received= null;
       Attack processed= null;
           
-      PlaceShips placeShips= new PlaceShips(this);
+      PlaceShips placeShips= new PlaceShips(this); //creates PlaceShips UI, displays connecting wait dialog 
       
-      while(connecting)
+      while(connecting) //while game is being set up
       {   
          try
          {     
-            bsSocket= new Socket(hostName, portNumber1);
+            bsSocket= new Socket(hostName, portNumber1); //connects to server via port 1
             in= new ObjectInputStream(bsSocket.getInputStream());
             out= new ObjectOutputStream(bsSocket.getOutputStream());
             out.flush();
                   
-            isPlayer1= in.readBoolean();
+            isPlayer1= in.readBoolean(); //gets boolean value to tell if P1 or P2
                
-            if(!isPlayer1)
+            if(!isPlayer1) //if P2
             {
-               bsSocket.close();
-               bsSocket= new Socket(hostName, portNumber2);
+               bsSocket.close(); //disconnects from port 1
+               bsSocket= new Socket(hostName, portNumber2); //connects via port 2
                in= new ObjectInputStream(bsSocket.getInputStream());
                out= new ObjectOutputStream(bsSocket.getOutputStream());
                out.flush();
                
-               isTurn= false;
+               isTurn= false; //P1 has 1st turn
             }
                
-            connecting= false;
+            connecting= false; //no longer connecting
          }
-         catch(UnknownHostException e)
+         catch(UnknownHostException e) //bad hostname
          {
             JOptionPane.showMessageDialog(null ,"Could not connect to server.\nCheck hostname and port numbers and try again.", "Connection Error", JOptionPane.ERROR_MESSAGE);          
             System.exit(1);
          }
-         catch(IOException e)
+         catch(IOException e) //closes connection if any IO error occurs
          {
             try
             {
@@ -76,9 +76,9 @@ public class BSClientThread extends Thread
          } 
       }
                 
-      placeShips.start();
+      placeShips.start(); //closes wait dialog and displays PlaceShips
          
-      try
+      try //synchronized wait until player is done placing ships
       {
          synchronized(this)
          {
@@ -92,18 +92,18 @@ public class BSClientThread extends Thread
          System.exit(1);
       }
                   
-      BattleshipUI mainGame= new BattleshipUI(placeShips.getShips(), this);
+      BattleshipUI mainGame= new BattleshipUI(placeShips.getShips(), this); //starts main game
            
       try
       {         
-         while(!endGame)
+         while(!endGame) //main game loop
          {
-            if(isTurn)
-            {
+            if(isTurn) //play's turn: gets processed attack from enemy and processes results of attack 
+            {          //actual attack is sent in this.sendAttack()
                received= (Attack)in.readObject();
                mainGame.processAttack(received); 
             }
-            else
+            else //enemy's turn: gets enemy attack, processes it, and returns results to enemy
             {
                received= (Attack)in.readObject();
                processed= mainGame.processAttack(received);
@@ -121,7 +121,7 @@ public class BSClientThread extends Thread
             processed= null;            
          }
          
-         bsSocket.close();
+         bsSocket.close(); //closes connection once game is over
       } 
       catch(IOException e)
       {
@@ -133,7 +133,7 @@ public class BSClientThread extends Thread
          JOptionPane.showMessageDialog(null ,"Error reading attack.", "Read Error", JOptionPane.ERROR_MESSAGE);          
          System.exit(1);
       }
-      catch(NullPointerException e)
+      catch(NullPointerException e) //if attack is null, then opponent has left game
       {
          JOptionPane.showMessageDialog(null ,"Opponent has left game.", "Communication Error", JOptionPane.ERROR_MESSAGE);          
          System.exit(1);

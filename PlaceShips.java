@@ -54,7 +54,7 @@ public class PlaceShips
       theFrame.setResizable(false);
       theFrame.getContentPane().setLayout(new BoxLayout(theFrame.getContentPane(), BoxLayout.Y_AXIS));
    
-      msgPanel= new JPanel(new GridLayout(1,3));
+      msgPanel= new JPanel(new GridLayout(1,3)); //game messages
       msgPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 0, 10));
       
       msgLabel= new JLabel("Select a ship to place.");
@@ -72,11 +72,11 @@ public class PlaceShips
       theFrame.add(msgPanel);
       theFrame.add(Box.createRigidArea(new Dimension(0,5)));
                   
-      buttonPanel= new JPanel(new GridLayout(1,5));
+      buttonPanel= new JPanel(new GridLayout(1,5)); //buttons
        
       PlaceShipsListener placeShipsListener= new PlaceShipsListener(); 
        
-      mode= 0;      
+      mode= 0; //initializes mode to "place"     
       modeButton= new JButton("Mode");
       modeButton.addActionListener(placeShipsListener);
       modeButton.setActionCommand("mode");
@@ -99,7 +99,7 @@ public class PlaceShips
       theFrame.add(buttonPanel);
       theFrame.add(new JSeparator(SwingConstants.HORIZONTAL));
             
-      gridPanel= new JPanel();
+      gridPanel= new JPanel(); //battleship grid
       gridPanel.setLayout(new BoxLayout(gridPanel,BoxLayout.X_AXIS));
       
       theGrid= new BSGrid(10);
@@ -111,7 +111,7 @@ public class PlaceShips
       
       theFrame.add(gridPanel);
       
-      shipPanel= new JPanel();
+      shipPanel= new JPanel(); //displays ships
       shipPanel.setLayout(new GridLayout(2,3));
       
       ImageIcon bsImg= new ImageIcon(getImageFile("/resources/ba_hor.png"));
@@ -126,7 +126,7 @@ public class PlaceShips
       destroyer= new JLabel(deImg);
       submarine= new JLabel(suImg);
    
-      shipOrientation= 0;
+      shipOrientation= 0; //initializes placement orrientation as horizontal
       orientation= new JButton("Change Orientation");
       orientation.addActionListener(placeShipsListener);
       orientation.setActionCommand("orientation");
@@ -163,7 +163,7 @@ public class PlaceShips
       clientThread= cT;      
    }
    
-   public void start()
+   public void start() //closes wait dialog and allows player to start ship placement after both players have connected
    {
       waitDialog.close();
       theFrame.setVisible(true);   
@@ -174,7 +174,7 @@ public class PlaceShips
       return(ships);
    }
    
-   private BufferedImage getImageFile(String filename)
+   private BufferedImage getImageFile(String filename) //JAR-friendly method to load image files
    {
       try
       {
@@ -189,7 +189,7 @@ public class PlaceShips
       return(null);
    }
       
-   private class GridMouser extends MouseAdapter
+   private class GridMouser extends MouseAdapter //handles mouse clicks on grid
    {
       public void mouseClicked(MouseEvent e)
       {         
@@ -199,9 +199,9 @@ public class PlaceShips
          Ship toErase;
          int i;
          
-         if(mode==0)
+         if(mode==0) //place
          {         
-            imgName.append("/resources/" + shipSelected + "_");
+            imgName.append("/resources/" + shipSelected + "_"); //starts img path with folder and ship name
                            
             if(clicked.getX()>=topLeftCorner.getX() && clicked.getY()>=topLeftCorner.getY())
             {
@@ -255,7 +255,7 @@ public class PlaceShips
             if(shipsAdded==5)
                doneButton.setEnabled(true);
          }
-         else
+         else //erase
          {
             for(i=0;i<shipsAdded;i++)
             {
@@ -306,6 +306,9 @@ public class PlaceShips
          }   
       }
       
+      //places selected ship on grid. 
+      //takes started img path, point clicked, orientation, and ship size
+      //returns true if placed, false if error
       private boolean placeShip(StringBuilder imgName, Point tempPoint, int orientation, int size)
       {
          BufferedImage shipImg;
@@ -316,14 +319,14 @@ public class PlaceShips
          int xPos= 0, yPos= 0;
          int i;
          
-         if(orientation==0)
+         if(orientation==0) //horizontal
          {
-            if(tempPoint.getX()<(330-((size-1)*30)))
+            if(tempPoint.getX()<(330-((size-1)*30))) //checks for valid placement
             {               
                imgName.append("hor.png");
                shipImg= getImageFile(imgName.toString());
                
-               for(i=0;i<size;i++)
+               for(i=0;i<size;i++) //creates array of points within grid spaces to be occupied by ship
                {
                   points[i]= new Point(tempPoint);
                   tempPoint.setLocation(tempPoint.getX()+30,tempPoint.getY());   
@@ -335,7 +338,7 @@ public class PlaceShips
                return(false);
             }     
          }
-         else
+         else //vertical
          {
             if(tempPoint.getY()<(330-((size-1)*30)))
             {
@@ -355,9 +358,9 @@ public class PlaceShips
             }
          }
          
-         ships[shipsAdded]= new Ship(shipSelected,size,shipOrientation,points);
+         ships[shipsAdded]= new Ship(shipSelected,size,shipOrientation,points); //adds new ship to ship list
          
-         if(shipsAdded>0)
+         if(shipsAdded>0) //checks intersections if not first ship
          {
             for(i=0;i<shipsAdded;i++)
             {
@@ -369,7 +372,7 @@ public class PlaceShips
             }
          }
                 
-         for(i=0;i<ships[shipsAdded].getSize();i++)
+         for(i=0;i<ships[shipsAdded].getSize();i++) //overlays ship image onto background grid space by grid space
          {
             temp= (JLabel)theGrid.findComponentAt(ships[shipsAdded].getLocation(i));
             
@@ -392,23 +395,23 @@ public class PlaceShips
       }         
    }
       
-   private void eraseShip(Ship toErase)
+   private void eraseShip(Ship toErase) //erases clicked ship
    {
       JLabel temp;
       int i;
          
-      for(i=0;i<toErase.getSize();i++)
+      for(i=0;i<toErase.getSize();i++) //replaces grid spaces occupied by ship with blank background
       {
          temp= (JLabel)theGrid.findComponentAt(toErase.getLocation(i));
          temp.setIcon(new ImageIcon(getImageFile("/resources/ocean.png")));
       }         
    } 
    
-   private class ShipMouser extends MouseAdapter
+   private class ShipMouser extends MouseAdapter //handles mouse clicks on ship display
    {
       public void mouseClicked(MouseEvent e)
       {
-         if(mode==0)
+         if(mode==0) //selects ship if mode is "place"
          {
             int xPos= e.getX();
             int yPos= e.getY();
@@ -443,11 +446,11 @@ public class PlaceShips
       }
    }
    
-   private class PlaceShipsListener implements ActionListener
+   private class PlaceShipsListener implements ActionListener //button listener
    {
       public void actionPerformed(ActionEvent e)
       {
-         if(e.getActionCommand().equals("orientation"))
+         if(e.getActionCommand().equals("orientation")) //toggles orrientation
          {
             if(shipOrientation==0)
             {
@@ -460,7 +463,7 @@ public class PlaceShips
                shipOrientation= 0;
             }     
          }
-         else if(e.getActionCommand().equals("mode"))
+         else if(e.getActionCommand().equals("mode")) //toggles mode
          {
             if(mode==0)
             {
@@ -473,16 +476,16 @@ public class PlaceShips
                modeLabel.setText("Mode: Place");
             }
          }
-         else if(e.getActionCommand().equals("help"))
+         else if(e.getActionCommand().equals("help")) //displays help message
          {
             new HelpDialog();
          }
-         else if(e.getActionCommand().equals("done"))
+         else if(e.getActionCommand().equals("done")) //finalizes ships and moves to main game
          {
             theFrame.setVisible(false);
             theFrame.dispose();   
             clientThread.setContToMain(true);
-            synchronized(clientThread)
+            synchronized(clientThread) //notifies server handling thread to continue game
             {
                clientThread.notifyAll();
             }
@@ -490,7 +493,7 @@ public class PlaceShips
       }
    }
    
-   private class WaitDialog extends JDialog implements ActionListener
+   private class WaitDialog extends JDialog implements ActionListener //dialog displayed until both players join game
    {
       private JPanel waitPanel;
       private JLabel waitMsg;
@@ -520,7 +523,7 @@ public class PlaceShips
          this.setVisible(true);
       }
    
-      public void actionPerformed(ActionEvent e)
+      public void actionPerformed(ActionEvent e) //quits if player cancels
       {
          System.exit(0);
       }
@@ -532,7 +535,7 @@ public class PlaceShips
       }
    }  
    
-   private class HelpDialog extends JDialog implements ActionListener
+   private class HelpDialog extends JDialog implements ActionListener //displays instructions
    {
       private JPanel helpPanel;
       private JLabel helpLabel1;

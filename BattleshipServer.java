@@ -46,26 +46,26 @@ public class BattleshipServer
    
       theFrame.add(Box.createRigidArea(new Dimension(5,0)));
    
-      leftPanel= new JPanel();
+      leftPanel= new JPanel(); //left side of window
       leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
             
       leftPanel.add(Box.createRigidArea(new Dimension(0,5)));
       
-      logoLabel= new JLabel(new ImageIcon(getImageFile("/resources/battleship_logo.png")));
+      logoLabel= new JLabel(new ImageIcon(getImageFile("/resources/battleship_logo.png"))); //logo
       logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
       leftPanel.add(logoLabel);
       
-      titleLabel= new JLabel("Game Server");
+      titleLabel= new JLabel("Game Server"); //title
       titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
       leftPanel.add(titleLabel);
       
-      byLabel= new JLabel("By: Jeremy Manin, ©Hasbro");
+      byLabel= new JLabel("By: Jeremy Manin, ©Hasbro"); //credits
       byLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
       leftPanel.add(byLabel);
       
       leftPanel.add(Box.createRigidArea(new Dimension(0,70)));
       
-      infoLabel= new JLabel("Instructions:");
+      infoLabel= new JLabel("Instructions:"); //instructions
       infoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
       leftPanel.add(infoLabel);
       
@@ -77,25 +77,25 @@ public class BattleshipServer
       infoLabel3.setAlignmentX(Component.CENTER_ALIGNMENT);
       leftPanel.add(infoLabel3);
                   
-      portPanel= new JPanel();
+      portPanel= new JPanel(); //ports
       portPanel.setLayout(new FlowLayout());
       portPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
       
       port1Label= new JLabel("Port 1:");
       portPanel.add(port1Label);
       
-      port1Field= new JTextField("4444");
+      port1Field= new JTextField("4444"); //default port number 1
       portPanel.add(port1Field);
       
       port2Label= new JLabel("Port 2:");
       portPanel.add(port2Label);
       
-      port2Field= new JTextField("4443");
+      port2Field= new JTextField("4443"); //default port number 2
       portPanel.add(port2Field);
       
       leftPanel.add(portPanel);
       
-      buttonPanel= new JPanel();
+      buttonPanel= new JPanel(); //buttons
       buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
       buttonPanel.setAlignmentY(Component.BOTTOM_ALIGNMENT);
       
@@ -122,9 +122,9 @@ public class BattleshipServer
       
       theFrame.add(new JSeparator(SwingConstants.VERTICAL));
       
-      rightPanel= new JPanel();
+      rightPanel= new JPanel(); //right side of window
       
-      console= new JTextArea(25,25);
+      console= new JTextArea(25,25); //console
       console.setEditable(false);
       console.append("Welcome to the Battleship Multiplayer Server");
       console.append("\nPress start to open server");
@@ -139,7 +139,7 @@ public class BattleshipServer
       theFrame.setVisible(true);      
    }
    
-   private BufferedImage getImageFile(String filename)
+   private BufferedImage getImageFile(String filename) //JAR-friendly method to load image files
    {
       try
       {
@@ -155,7 +155,7 @@ public class BattleshipServer
    {
       public void actionPerformed(ActionEvent e)
       {
-         if(e.getActionCommand().equals("start"))
+         if(e.getActionCommand().equals("start")) //start button, starts server thread
          {
             console.append("\n\nServer starting with ports " + port1Field.getText() + " and " + port2Field.getText() + ".");
          
@@ -167,7 +167,7 @@ public class BattleshipServer
             startButton.setEnabled(false);
             stopButton.setEnabled(true);
          }
-         else if(e.getActionCommand().equals("stop"))
+         else if(e.getActionCommand().equals("stop")) //stop button, closes connections and exits program
          {
             serverThread.closeConnection();
             System.exit(0);
@@ -189,17 +189,17 @@ public class BattleshipServer
          boolean isP1Turn= true;
          Attack fromClient= null;
           
-         while(connecting)
+         while(connecting) //loops while connecting to both players
          {
             try
             {            
                serverSocket1= new ServerSocket(Integer.parseInt(port1Field.getText()));
                serverSocket2= new ServerSocket(Integer.parseInt(port2Field.getText()));
             
-               p1Socket= serverSocket1.accept();
+               p1Socket= serverSocket1.accept(); //establishes connection with P1 via port 1
                console.append("\n\nPlayer 1 has connected: " + p1Socket.getInetAddress().toString());
                console.setCaretPosition(console.getDocument().getLength());
-               p2Socket= serverSocket1.accept();
+               p2Socket= serverSocket1.accept(); //establishes connection with P2 via port 1
                   
                p1Out= new ObjectOutputStream(p1Socket.getOutputStream());
                p1Out.flush();
@@ -208,13 +208,13 @@ public class BattleshipServer
                p2Out= new ObjectOutputStream(p2Socket.getOutputStream());
                p2Out.flush();
             
-               p1Out.writeBoolean(true);
+               p1Out.writeBoolean(true); //sends messages telling clients which player is P1 and which is P2
                p1Out.flush();      
                p2Out.writeBoolean(false);
                p2Out.flush();      
             
-               p2Socket.close();
-               p2Socket= serverSocket2.accept();
+               p2Socket.close(); //closes P2 connection via port 1
+               p2Socket= serverSocket2.accept(); //opens P2 connection on port 2
                console.append("\nPlayer 2 has connected: " + p2Socket.getInetAddress().toString());
                console.setCaretPosition(console.getDocument().getLength());
             
@@ -224,7 +224,7 @@ public class BattleshipServer
                
                connecting= false;
             }
-            catch(IOException e)
+            catch(IOException e) //restarts connection process if P1 disconnects before P2 has connected
             {
                console.append("\nConnection Error: " + e.toString());
                console.append("\nPlayer 1 has aborted connection.");
@@ -239,19 +239,20 @@ public class BattleshipServer
                      
          try
          {                           
-            while(!endGame)
+            while(!endGame) //loops until game is over
             {
-               if(isP1Turn)
+               if(isP1Turn) //P1's turn
                {
-                  fromClient= (Attack)p1In.readObject();
+                  fromClient= (Attack)p1In.readObject(); //gets P1's attack
                   console.append("\nP1 attacks " + fromClient.getCoordName() + ".");
                   console.setCaretPosition(console.getDocument().getLength());
                   
-                  p2Out.writeObject(fromClient);
+                  p2Out.writeObject(fromClient); //passes P1's attack to P2
                   p2Out.flush();
                   
-                  fromClient= (Attack)p2In.readObject();
-                  if(fromClient.getIsHit())
+                  fromClient= (Attack)p2In.readObject(); //gets P2's response
+                  
+                  if(fromClient.getIsHit()) //prints results of attack to console
                   {
                      console.append("\nP2 confirms " + fromClient.getCoordName() + " hits " + fromClient.getShipName() + ".");
                      console.setCaretPosition(console.getDocument().getLength());
@@ -272,10 +273,10 @@ public class BattleshipServer
                      console.setCaretPosition(console.getDocument().getLength());
                   }
                   
-                  p1Out.writeObject(fromClient);
+                  p1Out.writeObject(fromClient); //sends P2's response to P1
                   p1Out.flush();
                }      
-               else
+               else //P2's turn
                {
                   fromClient= (Attack)p2In.readObject();
                   console.append("\nP2 attacks " + fromClient.getCoordName() + ".");
@@ -311,8 +312,8 @@ public class BattleshipServer
                }
                
                console.append("\n");
-               endGame= fromClient.getEndGame();
-               isP1Turn= !isP1Turn;
+               endGame= fromClient.getEndGame(); //checks if game over
+               isP1Turn= !isP1Turn; //toggles whose turn it is
             }
             
             console.append("\nGame has ended.\nPress stop button to close server.");
@@ -324,12 +325,12 @@ public class BattleshipServer
             console.setCaretPosition(console.getDocument().getLength());
             try
             {
-               p1Out.writeObject(null);
+               p1Out.writeObject(null); //sends null to P1 to propagate error
             }
             catch(IOException e2){}
             try
             {
-               p2Out.writeObject(null);
+               p2Out.writeObject(null); //sends null to P2 to propagate error
             }
             catch(IOException e2){}
          }

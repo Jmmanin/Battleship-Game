@@ -34,10 +34,10 @@ public class Ship
       x= (int)locations[0].getX();
       y= (int)locations[0].getY();
       
-      x= (x/30)*30;
+      x= (x/30)*30; //rounds out x and y values of first point to align rectangle to grid
       y= (y/30)*30;
           
-      if(orientation==0)
+      if(orientation==0) //creates rectangles containing entire ship
       {
          totalSpaceOccupied= new Rectangle(x,y,size*30,30);
       }
@@ -46,7 +46,7 @@ public class Ship
          totalSpaceOccupied= new Rectangle(x,y,30,size*30);
       }
                   
-      spacesOccupied[0]= new Rectangle(x,y,30,30);
+      spacesOccupied[0]= new Rectangle(x,y,30,30); //creates array of rectangles for each seperate grid space occupied
                
       for(i=1;i<size;i++)
       {
@@ -127,7 +127,7 @@ public class Ship
          }
       }
       
-      if(hitCount==size)
+      if(hitCount==size) //ship is sunk if every space is hit
          isSunk= true;
          
       return(toReturn);   
@@ -138,7 +138,7 @@ public class Ship
       return(isSunk);
    }
    
-   public String toString()
+   public String toString() //prints ship info as string (for debugging)
    {
       StringBuilder output= new StringBuilder();
       

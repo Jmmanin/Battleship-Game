@@ -47,16 +47,16 @@ public class BattleshipUI
       theFrame.setResizable(false);
       theFrame.getContentPane().setLayout(new BoxLayout(theFrame.getContentPane(), BoxLayout.X_AXIS));
       
-      gamePanel= new JPanel();
+      gamePanel= new JPanel(); //main game panel
       gamePanel.setLayout(new BoxLayout(gamePanel, BoxLayout.Y_AXIS));
       
-      enemyGrid= new BSGrid(10);
+      enemyGrid= new BSGrid(10); //enemy grid (vertical grid in physical game)
       enemyGrid.addMouseListener(new MouseHandler());
             
-      msgPanel= new JPanel();
+      msgPanel= new JPanel(); //message display
       msgPanel.setLayout(new BoxLayout(msgPanel, BoxLayout.Y_AXIS));
             
-      statusPanel= new JPanel();
+      statusPanel= new JPanel(); //game status display
       statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
       
       if(clientThread.getIsTurn())
@@ -84,7 +84,7 @@ public class BattleshipUI
       msgLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
       msgPanel.add(msgLabel);
       
-      yourGrid= new BSGrid(10);
+      yourGrid= new BSGrid(10); //player's grid (horizontal grid in physical game)
             
       gamePanel.add(enemyGrid);
       gamePanel.add(Box.createVerticalStrut(10));
@@ -94,7 +94,7 @@ public class BattleshipUI
       gamePanel.add(yourGrid);
       gamePanel.add(Box.createVerticalStrut(8));
       
-      shipsRemainingPanel= new JPanel();
+      shipsRemainingPanel= new JPanel(); //displays enemy ships remaining
       shipsRemainingPanel.setLayout(new BoxLayout(shipsRemainingPanel, BoxLayout.Y_AXIS));
       
       shipsRemainingLabel= new JLabel("<html><center>Enemy<br>Ships<br>Remaining</center></html>");
@@ -147,7 +147,7 @@ public class BattleshipUI
       placeYourShips(yourShips);
    }
    
-   private void placeYourShips(Ship[] yourShips)
+   private void placeYourShips(Ship[] yourShips) //adds your ships to your grid
    {
       StringBuilder imgName= new StringBuilder("/resources/");
       BufferedImage shipImg;
@@ -170,25 +170,25 @@ public class BattleshipUI
                
          shipImg= getImageFile(imgName.toString());
          
-         for(j=0;j<yourShips[i].getSize();j++)
+         for(j=0;j<yourShips[i].getSize();j++) //overlays ship, grid space by grid space, over ocean
          {
-            temp= (JLabel)yourGrid.findComponentAt(yourShips[i].getLocation(j));
+            temp= (JLabel)yourGrid.findComponentAt(yourShips[i].getLocation(j)); //gets JLabel for target grid space
             
             g= combinedImg.getGraphics();
                
-            g.drawImage(bgImg,0,0,null);
+            g.drawImage(bgImg,0,0,null); //draws ocean background and section of ship
             g.drawImage(shipImg.getSubimage(xPos,yPos,30,30),0,0,null);
                                     
-            temp.setIcon(new ImageIcon(combinedImg));
+            temp.setIcon(new ImageIcon(combinedImg)); //sets new image for grid space
             
             g= disabledImg.getGraphics();
             
-            g.drawImage(combinedImg,0,0,null);
+            g.drawImage(combinedImg,0,0,null); //draws hit peg over ship
             g.drawImage(hitPegImg,0,0,null);
             
-            temp.setDisabledIcon(new ImageIcon(disabledImg));
+            temp.setDisabledIcon(new ImageIcon(disabledImg)); //sets hit peg image as disabled icon
             
-            if(yourShips[i].getOrientation()==0)
+            if(yourShips[i].getOrientation()==0) //advances across or down ship image
                xPos= xPos+30;
             else
                yPos= yPos+30; 
@@ -212,27 +212,27 @@ public class BattleshipUI
       boolean endGame= true;
       StringBuilder message= new StringBuilder();
       
-      if(toProccess==null)
+      if(toProccess==null) //player receives null if an error has occured
          throw new NullPointerException();
       
-      if(clientThread.getIsTurn())
+      if(clientThread.getIsTurn()) //if player's turn
       {
-         if(turnCounter==0)
+         if(turnCounter==0) //for first turn only
          {
             waitDialog.close();
             JOptionPane.showMessageDialog(theFrame, "Attack launched! Prepare for return fire!\nBattle stations! Battle stations!\nThis is not a drill!", "Attention Admiral!", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(getImageFile("/resources/alarm.png")));
          }
          
-         if(toProccess.getEndGame())
+         if(toProccess.getEndGame()) //if game is over
             new GameOverDialog(true);   
          
-         temp= (JLabel)enemyGrid.findComponentAt(toProccess.getCoords());
+         temp= (JLabel)enemyGrid.findComponentAt(toProccess.getCoords()); //gets JLabel for target grid space on enemy grid
          
          message.append("Attack at " + toProccess.getCoordName());
          
-         if(toProccess.getIsHit())
+         if(toProccess.getIsHit()) //if attack is hit
          {
-            BufferedImage a= getImageFile("/resources/ocean.png");
+            BufferedImage a= getImageFile("/resources/ocean.png"); //changes disabled image from miss to hit
             BufferedImage b= getImageFile("/resources/hit_peg.png");
             BufferedImage combined= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
             Graphics g= combined.getGraphics();
@@ -259,16 +259,16 @@ public class BattleshipUI
          else
             message.append(" misses.");            
       }
-      else
+      else //if other player's turn
       {
          if(turnCounter==0)
             JOptionPane.showMessageDialog(theFrame, "Enemy fleet activity detected!\nBattle stations! Battle stations!\nThis is not a drill!", "Attention Admiral!", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(getImageFile("/resources/alarm.png")));
          
-         temp= (JLabel)yourGrid.findComponentAt(toProccess.getCoords());
+         temp= (JLabel)yourGrid.findComponentAt(toProccess.getCoords()); //gets JLabel for target grid space on your grid
          
          message.append("Enemy attack at " + toProccess.getCoordName());
          
-         for(i=0;i<yourShips.length;i++)
+         for(i=0;i<yourShips.length;i++) //iterates through ships to determine if attack is hit
          {
             shipHit= yourShips[i].hitSpace(toProccess.getCoords());
             
@@ -294,7 +294,7 @@ public class BattleshipUI
          if(!shipHit)
             message.append(" misses.");
                      
-         for(i=0;i<yourShips.length;i++)
+         for(i=0;i<yourShips.length;i++) //checks for game over
          {
             if(!yourShips[i].getIsSunk())
                endGame= false;
@@ -309,7 +309,7 @@ public class BattleshipUI
             new ShipSunkDialog(false, toProccess.getShipName());            
       }
       
-      temp.setEnabled(false);
+      temp.setEnabled(false); //disables attacked grid space (so you cant attack it again)
       msgLabel.setText(message.toString());
       return(toProccess);
    }
@@ -325,7 +325,7 @@ public class BattleshipUI
       turnNumLabel.setText("Turn: " + turnCounter);      
    } 
    
-   private BufferedImage getImageFile(String filename)
+   private BufferedImage getImageFile(String filename) //JAR-friendly method to load image files
    {
       try
       {
@@ -340,16 +340,16 @@ public class BattleshipUI
       return(null);
    }
          
-   private class MouseHandler extends MouseAdapter
+   private class MouseHandler extends MouseAdapter //handles mouse clicks on enemy grid
    {
       public void mouseClicked(MouseEvent e)
       {
          int xPos= e.getX();
          int yPos= e.getY();
-         JLabel temp= (JLabel)enemyGrid.findComponentAt(xPos,yPos);
+         JLabel temp= (JLabel)enemyGrid.findComponentAt(xPos,yPos); //gets JLabel of grid space at clicked point
          
-         if(xPos>=30 && yPos>=30 && clientThread.getIsTurn() && temp.isEnabled())
-         {
+         if(xPos>=30 && yPos>=30 && clientThread.getIsTurn() && temp.isEnabled()) //if click not on column/row labels, it's players turn
+         {                                                                        //and grid space has not already been picked
             Point clicked;
             char yGrid= 64;
             int xGrid;
@@ -361,16 +361,16 @@ public class BattleshipUI
             xGrid= xPos/30;
             gridLoc.append(yGrid + Integer.toString(xGrid));
             
-            if(turnCounter==0)
+            if(turnCounter==0) //first turn only
                waitDialog= new WaitDialog();
             
-            clientThread.sendAttack(new Attack(clicked, gridLoc.toString()));
+            clientThread.sendAttack(new Attack(clicked, gridLoc.toString())); //sends new attack
          }
       }
    }
    
-   private class WaitDialog extends JDialog
-   {
+   private class WaitDialog extends JDialog //dialog shown after first attack and before other player has
+   {                                        //finished placing thier ships
       private JPanel waitPanel;
       private JLabel waitIcon;
       private JLabel waitMsg;
@@ -401,7 +401,7 @@ public class BattleshipUI
       }
    }
       
-   private class ShipSunkDialog extends JDialog implements ActionListener
+   private class ShipSunkDialog extends JDialog implements ActionListener //dialog shown when ship is sunk
    {
       private JPanel shipSunkPanel;
       private JPanel shipSunkMsgPanel;
@@ -425,7 +425,7 @@ public class BattleshipUI
       
          shipSunkMsgPanel.add(Box.createRigidArea(new Dimension(5,0)));
          
-         if(turn)
+         if(turn) //if your turn
          {
             if(shipName.equals("ba"))
             {
@@ -453,7 +453,7 @@ public class BattleshipUI
                submarine.setEnabled(false);
             }
          }
-         else
+         else //if enemy turn
          {
             if(shipName.equals("ba"))
                shipSunkMsg= new JLabel("Battleship has been sunk!");
@@ -493,7 +493,7 @@ public class BattleshipUI
       }
    }
       
-   private class GameOverDialog extends JDialog implements ActionListener
+   private class GameOverDialog extends JDialog implements ActionListener //dialog shown when game is over
    {
       private JPanel gameOverPanel;
       private JLabel gameOverIcon;
@@ -507,12 +507,12 @@ public class BattleshipUI
          gameOverPanel.setLayout(new BoxLayout(gameOverPanel, BoxLayout.Y_AXIS));
          gameOverPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
          
-         if(win)
+         if(win) //if player has won
          {
             gameOverIcon= new JLabel(new ImageIcon(getImageFile("/resources/you_win.png")));
             gameOverMsg= new JLabel("Congratulations! Thanks for playing!");
          }
-         else
+         else //if player has lost
          {
             gameOverIcon= new JLabel(new ImageIcon(getImageFile("/resources/you_lose.png")));
             gameOverMsg= new JLabel("Better luck next time. Thanks for playing!");
@@ -537,7 +537,7 @@ public class BattleshipUI
          this.setVisible(true);
       }
          
-      public void actionPerformed(ActionEvent e)
+      public void actionPerformed(ActionEvent e) //closes program when when close is clicked
       {
          System.exit(0);
       }

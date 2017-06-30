@@ -1,6 +1,6 @@
 /*
 Multiplayer Battleship Game
-BattleShip Grid
+Battleship Grid
 Jeremy Manin
 */
 
@@ -14,7 +14,7 @@ public class BSGrid extends JPanel
 {
    private int size;
    
-   public BSGrid(int s)
+   public BSGrid(int s) //takes in size argument (should always be 10 for the game)
    {
       size= s;
       JLabel tempLabel;
@@ -22,7 +22,7 @@ public class BSGrid extends JPanel
       ImageIcon disabledGridBG= null;
       char rowChar= 'A';
       
-      BufferedImage a= getImageFile("/resources/ocean.png");
+      BufferedImage a= getImageFile("/resources/ocean.png"); //overlays miss peg onto ocean for disabled icon (miss)
       BufferedImage b= getImageFile("/resources/miss_peg.png");
       BufferedImage combined= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
       Graphics g= combined.getGraphics();
@@ -34,23 +34,23 @@ public class BSGrid extends JPanel
                            
       setLayout(new GridLayout(11,11));
       
-      add(new JLabel());
+      add(new JLabel()); //blank space in top left corner
       
-      for(int i= 1;i<=size;i++)
+      for(int i= 1;i<=size;i++) //top row (numbers)
       {
          tempLabel= new JLabel(Integer.toString(i));
          tempLabel.setHorizontalAlignment(SwingConstants.CENTER);
          add(tempLabel);
       }   
    
-      for(int i=0;i<size*size+size;i++)
+      for(int i=0;i<size*size+size;i++) //
       {
-         if(i%11==0)
+         if(i%11==0) //for row labels (letters)
          {
             tempLabel= new JLabel(Character.toString(rowChar));
             rowChar++;
          }   
-         else
+         else //for ocean
          {
             tempLabel= new JLabel(gridBG);
             tempLabel.setDisabledIcon(disabledGridBG);
@@ -61,7 +61,7 @@ public class BSGrid extends JPanel
       }
    }
    
-   private BufferedImage getImageFile(String filename)
+   private BufferedImage getImageFile(String filename) //JAR-friendly method to load image files
    {
       try
       {
