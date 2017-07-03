@@ -25,6 +25,11 @@ public class BattleshipClient
    private JTextField port1Field;
    private JLabel port2Label;
    private JTextField port2Field;
+   private JPanel modeLabelPanel;
+   private JLabel modeLabel;
+   private JPanel radioPanel;
+   private ButtonGroup modeGroup;
+   private JRadioButton[] modes;
    private JPanel confirmPanel;
    private JLabel aboutLabel;
    private JButton confirm;
@@ -43,6 +48,8 @@ public class BattleshipClient
       logoPanel.add(logo);
       
       theFrame.add(logoPanel);
+      
+      theFrame.add(new JSeparator(SwingConstants.HORIZONTAL));
       
       hostPanel= new JPanel(); //host name
       hostPanel.setLayout(new FlowLayout());
@@ -72,6 +79,36 @@ public class BattleshipClient
       
       theFrame.add(portPanel);
       
+      theFrame.add(new JSeparator(SwingConstants.HORIZONTAL));
+      
+      modeLabelPanel= new JPanel(); //game modes
+      modeLabelPanel.setLayout(new FlowLayout());
+      
+      modeLabel= new JLabel("Select Game Mode");
+      modeLabelPanel.add(modeLabel);
+      
+      theFrame.add(modeLabelPanel);
+      
+      radioPanel= new JPanel();
+      radioPanel.setLayout(new FlowLayout());
+            
+      modes= new JRadioButton[2];
+      modes[0]= new JRadioButton("Standard"); //default game mode
+      radioPanel.add(modes[0]);
+      modes[0].setSelected(true);
+      modes[1]= new JRadioButton("Salvo");
+      radioPanel.add(modes[1]);
+      
+      modeGroup= new ButtonGroup();
+      modeGroup.add(modes[0]);
+      modeGroup.add(modes[1]);
+      
+      radioPanel.add(new JButton("Help"));
+            
+      theFrame.add(radioPanel);      
+       
+      theFrame.add(new JSeparator(SwingConstants.HORIZONTAL));
+            
       confirmPanel= new JPanel(); //credits and start button
       confirmPanel.setLayout(new BorderLayout());
        
