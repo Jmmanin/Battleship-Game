@@ -35,10 +35,11 @@ public class BattleshipUI
    
    private int turnCounter;
    private Ship[] yourShips;
+   private int gameMode;
    
    private BSClientThread clientThread;  
    
-   public BattleshipUI(Ship[] yS, BSClientThread cT)
+   public BattleshipUI(Ship[] yS, BSClientThread cT, int gM)
    {
       clientThread= cT;
       
@@ -145,6 +146,8 @@ public class BattleshipUI
             
       yourShips= yS;
       placeYourShips(yourShips);
+      
+      gameMode= gM;
    }
    
    private void placeYourShips(Ship[] yourShips) //adds your ships to your grid
@@ -203,7 +206,7 @@ public class BattleshipUI
       }
    } 
       
-   public Attack processAttack(Attack toProccess)
+   public Attack processAttack(Attack toProcess)
    {      
       JLabel temp= null;
       ImageIcon temp2;
@@ -212,9 +215,9 @@ public class BattleshipUI
       boolean endGame= true;
       StringBuilder message= new StringBuilder();
       
-      if(toProccess==null) //player receives null if an error has occured
+      if(toProcess==null) //player receives null if an error has occured
          throw new NullPointerException();
-      
+                     
       if(clientThread.getIsTurn()) //if player's turn
       {
          if(turnCounter==0) //for first turn only
@@ -223,14 +226,14 @@ public class BattleshipUI
             JOptionPane.showMessageDialog(theFrame, "Attack launched! Prepare for return fire!\nBattle stations! Battle stations!\nThis is not a drill!", "Attention Admiral!", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(getImageFile("/resources/alarm.png")));
          }
          
-         if(toProccess.getEndGame()) //if game is over
+         if(toProcess.getEndGame()) //if game is over
             new GameOverDialog(true);   
          
-         temp= (JLabel)enemyGrid.findComponentAt(toProccess.getCoords()); //gets JLabel for target grid space on enemy grid
+         temp= (JLabel)enemyGrid.findComponentAt(toProcess.getCoords()); //gets JLabel for target grid space on enemy grid
          
-         message.append("Attack at " + toProccess.getCoordName());
+         message.append("Attack at " + toProcess.getCoordName());
          
-         if(toProccess.getIsHit()) //if attack is hit
+         if(toProcess.getIsHit()) //if attack is hit
          {
             BufferedImage a= getImageFile("/resources/ocean.png"); //changes disabled image from miss to hit
             BufferedImage b= getImageFile("/resources/hit_peg.png");
@@ -242,19 +245,19 @@ public class BattleshipUI
                
             temp.setDisabledIcon(new ImageIcon(combined));
             
-            if(toProccess.getShipName().equals("ba"))
+            if(toProcess.getShipName().equals("ba"))
                message.append(" hits enemy battleship!");
-            else if(toProccess.getShipName().equals("ca"))
+            else if(toProcess.getShipName().equals("ca"))
                message.append(" hits enemy carrier!");
-            else if(toProccess.getShipName().equals("cr"))
+            else if(toProcess.getShipName().equals("cr"))
                message.append(" hits enemy cruiser!");
-            else if(toProccess.getShipName().equals("de"))
+            else if(toProcess.getShipName().equals("de"))
                message.append(" hits enemy destroyer!");
             else
                message.append(" hits enemy submarine!");
                
-            if(toProccess.getShipSunk())
-               new ShipSunkDialog(true, toProccess.getShipName());   
+            if(toProcess.getShipSunk())
+               new ShipSunkDialog(true, toProcess.getShipName());   
          }
          else
             message.append(" misses.");            
@@ -264,25 +267,25 @@ public class BattleshipUI
          if(turnCounter==0)
             JOptionPane.showMessageDialog(theFrame, "Enemy fleet activity detected!\nBattle stations! Battle stations!\nThis is not a drill!", "Attention Admiral!", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(getImageFile("/resources/alarm.png")));
          
-         temp= (JLabel)yourGrid.findComponentAt(toProccess.getCoords()); //gets JLabel for target grid space on your grid
+         temp= (JLabel)yourGrid.findComponentAt(toProcess.getCoords()); //gets JLabel for target grid space on your grid
          
-         message.append("Enemy attack at " + toProccess.getCoordName());
+         message.append("Enemy attack at " + toProcess.getCoordName());
          
          for(i=0;i<yourShips.length;i++) //iterates through ships to determine if attack is hit
          {
-            shipHit= yourShips[i].hitSpace(toProccess.getCoords());
+            shipHit= yourShips[i].hitSpace(toProcess.getCoords());
             
             if(shipHit)
             {
-               toProccess.setIsHit(yourShips[i].getName(),yourShips[i].getIsSunk());
+               toProcess.setIsHit(yourShips[i].getName(),yourShips[i].getIsSunk());
               
-               if(toProccess.getShipName().equals("ba"))
+               if(toProcess.getShipName().equals("ba"))
                   message.append(" hits battleship!");
-               else if(toProccess.getShipName().equals("ca"))
+               else if(toProcess.getShipName().equals("ca"))
                   message.append(" hits carrier!");
-               else if(toProccess.getShipName().equals("cr"))
+               else if(toProcess.getShipName().equals("cr"))
                   message.append(" hits cruiser!");
-               else if(toProccess.getShipName().equals("de"))
+               else if(toProcess.getShipName().equals("de"))
                   message.append(" hits destroyer!");
                else
                   message.append(" hits submarine!");
@@ -303,15 +306,15 @@ public class BattleshipUI
          if(endGame)
             new GameOverDialog(false);
          
-         toProccess.setEndGame(endGame);
+         toProcess.setEndGame(endGame);
          
-         if(toProccess.getShipSunk())
-            new ShipSunkDialog(false, toProccess.getShipName());            
+         if(toProcess.getShipSunk())
+            new ShipSunkDialog(false, toProcess.getShipName());            
       }
       
       temp.setEnabled(false); //disables attacked grid space (so you cant attack it again)
       msgLabel.setText(message.toString());
-      return(toProccess);
+      return(toProcess);
    }
    
    public void updateTurnLabels(boolean turn)

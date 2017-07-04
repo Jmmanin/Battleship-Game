@@ -30,9 +30,10 @@ public class BattleshipClient
    private JPanel radioPanel;
    private ButtonGroup modeGroup;
    private JRadioButton[] modes;
-   private JPanel confirmPanel;
+   private JButton help;
+   private JPanel startPanel;
    private JLabel aboutLabel;
-   private JButton confirm;
+   private JButton start;
    
    public BattleshipClient()
    {      
@@ -84,13 +85,13 @@ public class BattleshipClient
       modeLabelPanel= new JPanel(); //game modes
       modeLabelPanel.setLayout(new FlowLayout());
       
-      modeLabel= new JLabel("Select Game Mode");
+      modeLabel= new JLabel("Select Game Mode:");
       modeLabelPanel.add(modeLabel);
       
       theFrame.add(modeLabelPanel);
       
       radioPanel= new JPanel();
-      radioPanel.setLayout(new FlowLayout());
+      radioPanel.setLayout(new BoxLayout(radioPanel, BoxLayout.X_AXIS));
             
       modes= new JRadioButton[2];
       modes[0]= new JRadioButton("Standard"); //default game mode
@@ -103,23 +104,30 @@ public class BattleshipClient
       modeGroup.add(modes[0]);
       modeGroup.add(modes[1]);
       
-      radioPanel.add(new JButton("Help"));
+      ClientListener clientListener= new ClientListener();
+      
+      help= new JButton("Help");
+      help.addActionListener(clientListener);
+      help.setActionCommand("help");
+      radioPanel.add(help);
             
       theFrame.add(radioPanel);      
        
       theFrame.add(new JSeparator(SwingConstants.HORIZONTAL));
             
-      confirmPanel= new JPanel(); //credits and start button
-      confirmPanel.setLayout(new BorderLayout());
+      startPanel= new JPanel(); //credits and start button
+      startPanel.setLayout(new BoxLayout(startPanel, BoxLayout.X_AXIS)); 
        
       aboutLabel= new JLabel(" By: Jeremy Manin, ©Hasbro");
-      confirmPanel.add(aboutLabel, BorderLayout.WEST);
+      startPanel.add(aboutLabel);
+      startPanel.add(Box.createHorizontalStrut(10));
             
-      confirm= new JButton("Start Game");
-      confirm.addActionListener(new confirmListener());
-      confirmPanel.add(confirm, BorderLayout.EAST);
+      start= new JButton("Start Game");
+      start.addActionListener(clientListener);
+      start.setActionCommand("start");
+      startPanel.add(start);
       
-      theFrame.add(confirmPanel); 
+      theFrame.add(startPanel); 
             
       theFrame.pack();
       theFrame.setLocationRelativeTo(null);
@@ -141,16 +149,123 @@ public class BattleshipClient
       return(null);     
    }
       
-   private class confirmListener implements ActionListener
+   private class ClientListener implements ActionListener
    {
       public void actionPerformed(ActionEvent e) //starts server
       {
-         BSClientThread theThread= new BSClientThread(hostField.getText(), Integer.parseInt(port1Field.getText()), Integer.parseInt(port2Field.getText()));
-         theThread.start();
-         
-         theFrame.setVisible(false);
-         theFrame.dispose();
+         if(e.getActionCommand().equals("start"))
+         {
+            if(hostField.getText().equals("") || port1Field.getText().equals("") || port2Field.getText().equals(""))
+            {
+               JOptionPane.showMessageDialog(theFrame ,"Please provide a valid hostname and port numbers.", "Invalid Input", JOptionPane.WARNING_MESSAGE);          
+            }
+            else
+            {
+               int modeSelected= 0;
+            
+               if(modes[1].isSelected())
+                  modeSelected= 1;
+                           
+               BSClientThread theThread= new BSClientThread(hostField.getText(), Integer.parseInt(port1Field.getText()), Integer.parseInt(port2Field.getText()), modeSelected);
+               theThread.start();
+            
+               theFrame.setVisible(false);
+               theFrame.dispose();
+            }
+         }
+         else if(e.getActionCommand().equals("help"))
+         {
+            new HelpDialog();
+         }
       }
+   }
+   
+   private class HelpDialog extends JDialog implements ActionListener //displays instructions
+   {
+      private JPanel helpPanel;
+      private JLabel helpLabel1;
+      private JLabel helpLabel2;
+      private JLabel helpLabel3;
+      private JLabel helpLabel4;
+      private JLabel helpLabel5;
+      private JLabel helpLabel6;
+      private JLabel helpLabel7;
+      private JLabel helpLabel8;
+      private JLabel helpLabel9;
+      private JLabel helpLabel10;
+      private JButton contButton;
+      
+      public HelpDialog()
+      {
+         super(theFrame,"Help",false);
+         helpPanel= new JPanel();
+         helpPanel.setLayout(new BoxLayout(helpPanel, BoxLayout.Y_AXIS));
+         helpPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+         
+         helpLabel1= new JLabel("Game Mode Help:");         
+         helpLabel1.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(helpLabel1);
+         
+         helpPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
+         
+         helpLabel2= new JLabel("Standard Mode:");         
+         helpLabel2.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(helpLabel2);
+      
+         helpLabel3= new JLabel("Tried and true. The classic");
+         helpLabel3.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(helpLabel3);
+      
+         helpLabel4= new JLabel("Battleship experience.");
+         helpLabel4.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(helpLabel4);
+         
+         helpPanel.add(Box.createVerticalStrut(6));
+         
+         helpLabel5= new JLabel("Salvo Mode:");
+         helpLabel5.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(helpLabel5);
+      
+         helpLabel6= new JLabel("For more experienced admirals.");         
+         helpLabel6.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(helpLabel6);
+         
+         helpLabel7= new JLabel("Each turn you send attacks");         
+         helpLabel7.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(helpLabel7);
+      
+         helpLabel8= new JLabel("equal to the number of ships");         
+         helpLabel8.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(helpLabel8);
+         
+         helpLabel9= new JLabel("you have remaining. Which ships");
+         helpLabel9.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(helpLabel9);
+      
+         helpLabel10= new JLabel("are hit is no longer disclosed.");         
+         helpLabel10.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(helpLabel10);
+                  
+         helpPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
+         
+         contButton= new JButton("Continue");
+         contButton.addActionListener(this);
+         contButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+         helpPanel.add(contButton);
+         
+         this.setContentPane(helpPanel);
+         this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+         this.pack();
+         this.setResizable(false);
+         this.setLocationRelativeTo(theFrame);
+         this.setVisible(true);
+      }
+         
+      public void actionPerformed(ActionEvent e)
+      {
+         this.setVisible(false);
+         this.dispose();
+      }   
    }
          
    public static void main(String args[])

@@ -14,6 +14,7 @@ public class BSClientThread extends Thread
 {
    private String hostName;
    private int portNumber1, portNumber2;
+   private int gameMode;
    private Socket bsSocket;
    private ObjectInputStream in;
    private ObjectOutputStream out;
@@ -21,11 +22,12 @@ public class BSClientThread extends Thread
    private boolean contToMain= false;
    private boolean endGame= false;
                      
-   public BSClientThread(String hN, int pN1, int pN2)
+   public BSClientThread(String hN, int pN1, int pN2, int gM)
    {
       hostName= hN;
       portNumber1= pN1;
-      portNumber2= pN2;   
+      portNumber2= pN2;
+      gameMode= gM;   
    }
    
    public void run()
@@ -75,6 +77,39 @@ public class BSClientThread extends Thread
             catch(IOException e2){}            
          } 
       }
+      
+      int gameMode2= -1;
+      
+      try
+      {
+         out.writeInt(gameMode);
+         out.flush();
+         gameMode2= in.readInt();
+      }
+      catch(IOException e){}
+      
+      if(gameMode2!=gameMode)
+      {
+         StringBuilder errorMessage= new StringBuilder("Player chose \"");
+         
+         if(gameMode==0)
+            errorMessage.append("standard\" ");
+         else
+            errorMessage.append("salvo\" ");
+           
+         errorMessage.append("and opponent chose \"");
+            
+         if(gameMode2==0)
+            errorMessage.append("standard\".");
+         else
+            errorMessage.append("salvo\".");
+            
+         errorMessage.append("\nBoth players must choose the same game mode.");
+                     
+         JOptionPane.showMessageDialog(null , errorMessage.toString(), "Game Mode Mismatch", JOptionPane.ERROR_MESSAGE);          
+         
+         System.exit(0);
+      } 
                 
       placeShips.start(); //closes wait dialog and displays PlaceShips
          
@@ -92,7 +127,7 @@ public class BSClientThread extends Thread
          System.exit(1);
       }
                   
-      BattleshipUI mainGame= new BattleshipUI(placeShips.getShips(), this); //starts main game
+      BattleshipUI mainGame= new BattleshipUI(placeShips.getShips(), this, gameMode); //starts main game
            
       try
       {         
