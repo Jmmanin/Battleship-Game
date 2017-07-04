@@ -562,7 +562,7 @@ public class PlaceShips
          helpLabel1.setAlignmentX(Component.CENTER_ALIGNMENT);
          helpPanel.add(helpLabel1);
          
-         helpPanel.add(Box.createVerticalStrut(3));
+         helpPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
          
          helpLabel2= new JLabel("Click a ship to select it.");         
          helpLabel2.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -572,7 +572,7 @@ public class PlaceShips
          helpLabel3.setAlignmentX(Component.CENTER_ALIGNMENT);
          helpPanel.add(helpLabel3);
       
-         helpLabel4= new JLabel("Ship extends to the right/down");
+         helpLabel4= new JLabel("Ship extends to the right or down");
          helpLabel4.setAlignmentX(Component.CENTER_ALIGNMENT);
          helpPanel.add(helpLabel4);
          
@@ -584,7 +584,7 @@ public class PlaceShips
          helpLabel6.setAlignmentX(Component.CENTER_ALIGNMENT);
          helpPanel.add(helpLabel6);
          
-         helpLabel7= new JLabel("b/t horizontal and vertical placement.");         
+         helpLabel7= new JLabel("between horizontal and vertical placement.");         
          helpLabel7.setAlignmentX(Component.CENTER_ALIGNMENT);
          helpPanel.add(helpLabel7);
       
@@ -592,7 +592,7 @@ public class PlaceShips
          helpLabel8.setAlignmentX(Component.CENTER_ALIGNMENT);
          helpPanel.add(helpLabel8);
          
-         helpLabel9= new JLabel("b/t place and erase modes.");
+         helpLabel9= new JLabel("between place and erase modes.");
          helpLabel9.setAlignmentX(Component.CENTER_ALIGNMENT);
          helpPanel.add(helpLabel9);
       
@@ -604,7 +604,7 @@ public class PlaceShips
          helpLabel11.setAlignmentX(Component.CENTER_ALIGNMENT);
          helpPanel.add(helpLabel11);
          
-         helpPanel.add(Box.createVerticalStrut(3));
+         helpPanel.add(new JSeparator(SwingConstants.HORIZONTAL));
          
          contButton= new JButton("Continue");
          contButton.addActionListener(this);

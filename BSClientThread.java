@@ -36,6 +36,8 @@ public class BSClientThread extends Thread
       boolean isPlayer1;
       Attack received= null;
       Attack processed= null;
+      Attack[] receivedSalvo= null;
+      Attack[] processedSalvo= null;
           
       PlaceShips placeShips= new PlaceShips(this); //creates PlaceShips UI, displays connecting wait dialog 
       
@@ -133,27 +135,59 @@ public class BSClientThread extends Thread
       {         
          while(!endGame) //main game loop
          {
-            if(isTurn) //play's turn: gets processed attack from enemy and processes results of attack 
-            {          //actual attack is sent in this.sendAttack()
-               received= (Attack)in.readObject();
-               mainGame.processAttack(received); 
-            }
-            else //enemy's turn: gets enemy attack, processes it, and returns results to enemy
+            if(gameMode==0) //standard game mode
             {
-               received= (Attack)in.readObject();
-               processed= mainGame.processAttack(received);
-               sendAttack(processed);
+               if(isTurn) //player's turn: gets processed attack from enemy and processes results of attack 
+               {          //actual attack is sent in this.sendAttack()
+                  received= (Attack)in.readObject();
+                  mainGame.processAttack(received); 
+               }
+               else //enemy's turn: gets enemy attack, processes it, and returns results to enemy
+               {
+                  received= (Attack)in.readObject();
+                  processed= mainGame.processAttack(received);
+                  sendAttack(processed);
+               }
+            
+               endGame= received.getEndGame();
+            
+               out.flush();
+            
+               isTurn= !isTurn;
+               mainGame.updateTurnLabels(isTurn);
+            
+               received= null;
+               processed= null; 
             }
-         
-            endGame= received.getEndGame();
-         
-            out.flush();
+            else //salvo game mode
+            {
+               if(isTurn) //player's turn: gets processed attacks from enemy and processes results of attacks 
+               {          //actual attacks are sent in this.sendAttacks()
+                  receivedSalvo= (Attack[])in.readObject();
+                  mainGame.processAttacks(receivedSalvo); 
+               }
+               else //enemy's turn: gets enemy attacks, processes them, and returns results to enemy
+               {
+                  receivedSalvo= (Attack[])in.readObject();
+                  processedSalvo= mainGame.processAttacks(receivedSalvo);
+                  sendAttacks(processedSalvo);
+               }
+               
+               for(int i=0;i<receivedSalvo.length;i++)
+               {
+                  endGame= receivedSalvo[i].getEndGame();
+                  if(endGame)
+                     break;
+               }
+               
+               out.flush();
             
-            isTurn= !isTurn;
-            mainGame.updateTurnLabels(isTurn);
+               isTurn= !isTurn;
+               mainGame.updateTurnLabels(isTurn);
             
-            received= null;
-            processed= null;            
+               receivedSalvo= null;
+               processedSalvo= null; 
+            }           
          }
          
          bsSocket.close(); //closes connection once game is over
@@ -186,6 +220,20 @@ public class BSClientThread extends Thread
    }
    
    public void sendAttack(Attack toSend)
+   {
+      try
+      {
+         out.writeObject(toSend);
+         out.flush();
+      }
+      catch(IOException e)
+      {
+         JOptionPane.showMessageDialog(null ,"Error communicating with server.\nCheck connection to server and try again.", "Communication Error", JOptionPane.ERROR_MESSAGE);          
+         closeConnection();
+      }
+   }
+   
+   public void sendAttacks(Attack[] toSend)
    {
       try
       {

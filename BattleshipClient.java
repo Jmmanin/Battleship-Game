@@ -151,11 +151,11 @@ public class BattleshipClient
       
    private class ClientListener implements ActionListener
    {
-      public void actionPerformed(ActionEvent e) //starts server
+      public void actionPerformed(ActionEvent e)
       {
-         if(e.getActionCommand().equals("start"))
+         if(e.getActionCommand().equals("start")) //starts server
          {
-            if(hostField.getText().equals("") || port1Field.getText().equals("") || port2Field.getText().equals(""))
+            if(hostField.getText().equals("") || port1Field.getText().equals("") || port2Field.getText().equals("")) //checks for empty fields
             {
                JOptionPane.showMessageDialog(theFrame ,"Please provide a valid hostname and port numbers.", "Invalid Input", JOptionPane.WARNING_MESSAGE);          
             }
@@ -163,7 +163,7 @@ public class BattleshipClient
             {
                int modeSelected= 0;
             
-               if(modes[1].isSelected())
+               if(modes[1].isSelected()) //switches to salvo mode if selected
                   modeSelected= 1;
                            
                BSClientThread theThread= new BSClientThread(hostField.getText(), Integer.parseInt(port1Field.getText()), Integer.parseInt(port2Field.getText()), modeSelected);
@@ -173,7 +173,7 @@ public class BattleshipClient
                theFrame.dispose();
             }
          }
-         else if(e.getActionCommand().equals("help"))
+         else if(e.getActionCommand().equals("help")) //opens help dialog
          {
             new HelpDialog();
          }
@@ -242,7 +242,7 @@ public class BattleshipClient
          helpLabel9.setAlignmentX(Component.CENTER_ALIGNMENT);
          helpPanel.add(helpLabel9);
       
-         helpLabel10= new JLabel("are hit is no longer disclosed.");         
+         helpLabel10= new JLabel("you hit is no longer disclosed.");         
          helpLabel10.setAlignmentX(Component.CENTER_ALIGNMENT);
          helpPanel.add(helpLabel10);
                   

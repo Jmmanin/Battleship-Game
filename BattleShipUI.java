@@ -35,7 +35,12 @@ public class BattleshipUI
    
    private int turnCounter;
    private Ship[] yourShips;
+   
    private int gameMode;
+   
+   private int yourShipsRemaining; //vars for salvo mode
+   private int attacksMade;
+   private Attack[] attacks;
    
    private BSClientThread clientThread;  
    
@@ -148,6 +153,9 @@ public class BattleshipUI
       placeYourShips(yourShips);
       
       gameMode= gM;
+      yourShipsRemaining= 5;
+      attacksMade= 0;
+      attacks= new Attack[yourShipsRemaining];
    }
    
    private void placeYourShips(Ship[] yourShips) //adds your ships to your grid
@@ -317,6 +325,11 @@ public class BattleshipUI
       return(toProcess);
    }
    
+   public Attack[] processAttacks(Attack[] toProcess)
+   {
+      return(null); //FINISH
+   }
+   
    public void updateTurnLabels(boolean turn)
    {
       if(turn)
@@ -358,7 +371,7 @@ public class BattleshipUI
             int xGrid;
             StringBuilder gridLoc= new StringBuilder();
             Attack userAttack;
-         
+                                 
             clicked= new Point(xPos, yPos);
             yGrid= (char)(yGrid + (yPos/30));
             xGrid= xPos/30;
@@ -367,7 +380,35 @@ public class BattleshipUI
             if(turnCounter==0) //first turn only
                waitDialog= new WaitDialog();
             
-            clientThread.sendAttack(new Attack(clicked, gridLoc.toString())); //sends new attack
+            if(gameMode==0) //standard game mode
+               clientThread.sendAttack(new Attack(clicked, gridLoc.toString())); //sends new attack
+            else //salvo
+            {               
+               if(attacksMade==0)
+                  attacks= new Attack[yourShipsRemaining];
+            
+               attacks[attacksMade]= new Attack(clicked, gridLoc.toString());
+               attacksMade++;
+               
+               temp= (JLabel)enemyGrid.findComponentAt(clicked);
+            
+               BufferedImage a= getImageFile("/resources/ocean.png"); //changes disabled image from miss to pending
+               BufferedImage b= getImageFile("/resources/pending_peg.png");
+               BufferedImage combined= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
+               Graphics g= combined.getGraphics();
+               
+               g.drawImage(a,0,0,null);
+               g.drawImage(b,0,0,null);
+               
+               temp.setDisabledIcon(new ImageIcon(combined));
+               temp.setEnabled(false);
+               
+               if(attacksMade==yourShipsRemaining)
+               {
+                  clientThread.sendAttacks(attacks); 
+                  attacksMade= 0;
+               }   
+            }   
          }
       }
    }
