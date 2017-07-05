@@ -217,6 +217,8 @@ public class BattleshipUI
          xPos= 0;
          yPos= 0;
       }
+      
+      yourGrid.update(yourGrid.getGraphics()); //ensures all ships are properly drawn
    } 
       
    public Attack processAttack(Attack toProcess)
@@ -350,7 +352,7 @@ public class BattleshipUI
             JOptionPane.showMessageDialog(theFrame, "Salvo launched! Prepare for return fire!\nBattle stations! Battle stations!\nThis is not a drill!", "Attention Admiral!", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(getImageFile("/resources/alarm.png")));
          }
                   
-         for(int i=0;i<toProcess.length;i++)
+         for(int i=0;i<toProcess.length;i++) //iterates through attacks in salvo
          {
             if(toProcess[i].getEndGame()) //if game is over
                new GameOverDialog(true);
@@ -359,7 +361,7 @@ public class BattleshipUI
          
             if(toProcess[i].getIsHit()) //if attack is hit
             {
-               BufferedImage a= getImageFile("/resources/ocean.png"); //changes disabled image from miss to hit
+               BufferedImage a= getImageFile("/resources/ocean.png"); //changes disabled image from pending to hit
                BufferedImage b= getImageFile("/resources/hit_peg.png");
                BufferedImage combined= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
                Graphics g= combined.getGraphics();
@@ -378,7 +380,7 @@ public class BattleshipUI
             }
             else
             {
-               BufferedImage a= getImageFile("/resources/ocean.png"); //changes disabled image from miss to hit
+               BufferedImage a= getImageFile("/resources/ocean.png"); //changes disabled image from pending to miss
                BufferedImage b= getImageFile("/resources/miss_peg.png");
                BufferedImage combined= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
                Graphics g= combined.getGraphics();
