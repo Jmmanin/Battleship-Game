@@ -47,6 +47,7 @@ public class BattleshipUI
    public BattleshipUI(Ship[] yS, BSClientThread cT, int gM)
    {
       clientThread= cT;
+      gameMode= gM;
       
       theFrame= new JFrame("Battleship Game");
       theFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -80,11 +81,16 @@ public class BattleshipUI
       statusPanel.add(turnNumLabel);
    
       msgPanel.add(statusPanel);
-            
+       
       if(clientThread.getIsTurn())
-         msgLabel= new JLabel("Make your first attack.");
+      {
+         if(gameMode==0)      
+            msgLabel= new JLabel("Make your first attack.");
+         else
+            msgLabel= new JLabel("Prepare your first salvo.");
+      }
       else
-         msgLabel= new JLabel("Scanning for enemy attack.");
+         msgLabel= new JLabel("Scanning for enemy activity.");
       msgLabel.setFont(new Font("Arial",Font.BOLD,16));
       msgLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
       msgLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
@@ -152,7 +158,6 @@ public class BattleshipUI
       yourShips= yS;
       placeYourShips(yourShips);
       
-      gameMode= gM;
       yourShipsRemaining= 5;
       attacksMade= 0;
       attacks= new Attack[yourShipsRemaining];
@@ -327,7 +332,124 @@ public class BattleshipUI
    
    public Attack[] processAttacks(Attack[] toProcess)
    {
-      return(null); //FINISH
+      JLabel temp= null;
+      ImageIcon temp2;
+      boolean shipHit= false;
+      boolean endGame= true;
+      String message= null;
+      int hitCounter= 0;
+      
+      if(toProcess==null) //player receives null if an error has occured
+         throw new NullPointerException();
+                     
+      if(clientThread.getIsTurn()) //if player's turn
+      {
+         if(turnCounter==0) //for first turn only
+         {
+            waitDialog.close();
+            JOptionPane.showMessageDialog(theFrame, "Salvo launched! Prepare for return fire!\nBattle stations! Battle stations!\nThis is not a drill!", "Attention Admiral!", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(getImageFile("/resources/alarm.png")));
+         }
+                  
+         for(int i=0;i<toProcess.length;i++)
+         {
+            if(toProcess[i].getEndGame()) //if game is over
+               new GameOverDialog(true);
+         
+            temp= (JLabel)enemyGrid.findComponentAt(toProcess[i].getCoords()); //gets JLabel for target grid space on enemy grid
+         
+            if(toProcess[i].getIsHit()) //if attack is hit
+            {
+               BufferedImage a= getImageFile("/resources/ocean.png"); //changes disabled image from miss to hit
+               BufferedImage b= getImageFile("/resources/hit_peg.png");
+               BufferedImage combined= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
+               Graphics g= combined.getGraphics();
+               
+               g.drawImage(a,0,0,null);
+               g.drawImage(b,0,0,null);
+               
+               temp.setDisabledIcon(new ImageIcon(combined));
+                                             
+               hitCounter++;
+               
+               if(toProcess[i].getShipSunk())
+               {
+                  new ShipSunkDialog(true, toProcess[i].getShipName());
+               }    
+            }
+            else
+            {
+               BufferedImage a= getImageFile("/resources/ocean.png"); //changes disabled image from miss to hit
+               BufferedImage b= getImageFile("/resources/miss_peg.png");
+               BufferedImage combined= new BufferedImage(30,30,BufferedImage.TYPE_INT_ARGB);
+               Graphics g= combined.getGraphics();
+               
+               g.drawImage(a,0,0,null);
+               g.drawImage(b,0,0,null);
+               
+               temp.setDisabledIcon(new ImageIcon(combined));
+            }
+         }
+         
+         if(hitCounter==1)
+            message= new String("Salvo has " + hitCounter + " confirmed hit!");             
+         else if(hitCounter>0)
+            message= new String("Salvo has " + hitCounter + " confirmed hits!");             
+         else
+            message= new String("All attacks in salvo miss.");         
+      }
+      else //if other player's turn
+      {
+         if(turnCounter==0)
+            JOptionPane.showMessageDialog(theFrame, "Enemy fleet activity detected!\nBattle stations! Battle stations!\nThis is not a drill!", "Attention Admiral!", JOptionPane.INFORMATION_MESSAGE, new ImageIcon(getImageFile("/resources/alarm.png")));
+         
+         for(int i=0;i<toProcess.length;i++)
+         {
+            temp= (JLabel)yourGrid.findComponentAt(toProcess[i].getCoords()); //gets JLabel for target grid space on your grid
+            temp.setEnabled(false); 
+                  
+            for(int j=0;j<yourShips.length;j++) //iterates through ships to determine if attack is hit
+            {
+               shipHit= yourShips[j].hitSpace(toProcess[i].getCoords());
+            
+               if(shipHit)
+               {
+                  toProcess[i].setIsHit(yourShips[j].getName(),yourShips[j].getIsSunk());                      
+                  hitCounter++;
+                  break;
+               }   
+            }
+                              
+            for(int j=0;j<yourShips.length;j++) //checks for game over
+            {
+               if(!yourShips[j].getIsSunk())
+                  endGame= false;
+            }
+         
+            if(endGame)
+               new GameOverDialog(false);
+         
+            toProcess[i].setEndGame(endGame);
+         
+            if(toProcess[i].getShipSunk())
+            {
+               new ShipSunkDialog(false, toProcess[i].getShipName());
+               yourShipsRemaining--;
+            }
+            
+            shipHit= false;   
+         }
+         
+         if(hitCounter==1)
+            message= new String("Enemy salvo has " + hitCounter + " hit on fleet!");    
+         else if(hitCounter>0)
+            message= new String("Enemy salvo has " + hitCounter + " hits on fleet!");    
+         else
+            message= new String("All attacks in enemy salvo miss.");
+      }
+      
+      msgLabel.setText(message);
+      hitCounter= 0;
+      return(toProcess);
    }
    
    public void updateTurnLabels(boolean turn)
@@ -376,14 +498,19 @@ public class BattleshipUI
             yGrid= (char)(yGrid + (yPos/30));
             xGrid= xPos/30;
             gridLoc.append(yGrid + Integer.toString(xGrid));
-            
-            if(turnCounter==0) //first turn only
-               waitDialog= new WaitDialog();
-            
+                        
             if(gameMode==0) //standard game mode
+            {
+               if(turnCounter==0) //first turn only
+                  waitDialog= new WaitDialog();
+            
                clientThread.sendAttack(new Attack(clicked, gridLoc.toString())); //sends new attack
+            }
             else //salvo
-            {               
+            { 
+               if(turnCounter==0 && attacksMade==(yourShipsRemaining-1)) //for final attack in first salvo
+                  waitDialog= new WaitDialog();
+                          
                if(attacksMade==0)
                   attacks= new Attack[yourShipsRemaining];
             
@@ -407,7 +534,9 @@ public class BattleshipUI
                {
                   clientThread.sendAttacks(attacks); 
                   attacksMade= 0;
-               }   
+               }
+               
+               System.out.println(attacksMade + " out of " + yourShipsRemaining);  
             }   
          }
       }

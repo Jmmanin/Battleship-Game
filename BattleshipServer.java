@@ -405,6 +405,9 @@ public class BattleshipServer
                            if(endGame)
                               break;
                         }
+                        
+                        p1Out.writeObject(fromClientSalvo); //sends P2's response to P1
+                        p1Out.flush();
                      }
                      else //P2's turn
                      {
@@ -449,6 +452,9 @@ public class BattleshipServer
                            if(endGame)
                               break;
                         }
+                        
+                        p2Out.writeObject(fromClientSalvo);
+                        p2Out.flush();
                      }
                   }
                   
