@@ -418,18 +418,7 @@ public class BattleshipUI
                   break;
                }   
             }
-                              
-            for(int j=0;j<yourShips.length;j++) //checks for game over
-            {
-               if(!yourShips[j].getIsSunk())
-                  endGame= false;
-            }
-         
-            if(endGame)
-               new GameOverDialog(false);
-         
-            toProcess[i].setEndGame(endGame);
-         
+                                                         
             if(toProcess[i].getShipSunk())
             {
                new ShipSunkDialog(false, toProcess[i].getShipName());
@@ -438,6 +427,17 @@ public class BattleshipUI
             
             shipHit= false;   
          }
+         
+         for(int i=0;i<yourShips.length;i++) //checks for game over
+         {
+            if(!yourShips[i].getIsSunk())
+               endGame= false;
+         }
+         
+         toProcess[toProcess.length-1].setEndGame(endGame);
+         
+         if(endGame)
+            new GameOverDialog(false);
          
          if(hitCounter==1)
             message= new String("Enemy salvo has " + hitCounter + " hit on fleet!");    
@@ -534,9 +534,7 @@ public class BattleshipUI
                {
                   clientThread.sendAttacks(attacks); 
                   attacksMade= 0;
-               }
-               
-               System.out.println(attacksMade + " out of " + yourShipsRemaining);  
+               }               
             }   
          }
       }

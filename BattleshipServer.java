@@ -278,7 +278,7 @@ public class BattleshipServer
             
             console.setCaretPosition(console.getDocument().getLength());
                      
-            console.append("\n\nBoth players have connected\n\nEntering main game.");
+            console.append("\n\nBoth players have connected\n\nEntering main game.\n");
             console.setCaretPosition(console.getDocument().getLength());
                      
             try
@@ -381,22 +381,22 @@ public class BattleshipServer
                         {
                            if(fromClientSalvo[i].getIsHit())
                            {
-                              console.append("\nP2 confirms " + fromClientSalvo[i].getCoordName() + " hits.");
+                              console.append("\n  P2 confirms " + fromClientSalvo[i].getCoordName() + " hits.");
                               console.setCaretPosition(console.getDocument().getLength());
                            }
                            else
                            {
-                              console.append("\nP2 confirms " + fromClientSalvo[i].getCoordName() + " misses.");
+                              console.append("\n  P2 confirms " + fromClientSalvo[i].getCoordName() + " misses.");
                               console.setCaretPosition(console.getDocument().getLength());
                            }
                            if(fromClientSalvo[i].getShipSunk())
                            {
-                              console.append("\n  P2 " + fromClientSalvo[i].getShipName() + " sunk.");
+                              console.append("\n    P2 " + fromClientSalvo[i].getShipName() + " sunk.");
                               console.setCaretPosition(console.getDocument().getLength());
                            }
                            if(fromClientSalvo[i].getEndGame())
                            {
-                              console.append("\n  P1 Wins!");
+                              console.append("\n\nP1 Wins!");
                               console.setCaretPosition(console.getDocument().getLength());
                            }
                            
@@ -428,22 +428,22 @@ public class BattleshipServer
                         {
                            if(fromClientSalvo[i].getIsHit())
                            {
-                              console.append("\nP1 confirms " + fromClientSalvo[i].getCoordName() + " hits.");
+                              console.append("\n  P1 confirms " + fromClientSalvo[i].getCoordName() + " hits.");
                               console.setCaretPosition(console.getDocument().getLength());
                            }
                            else
                            {
-                              console.append("\nP1 confirms " + fromClientSalvo[i].getCoordName() + " misses.");
+                              console.append("\n  P1 confirms " + fromClientSalvo[i].getCoordName() + " misses.");
                               console.setCaretPosition(console.getDocument().getLength());
                            }
                            if(fromClientSalvo[i].getShipSunk())
                            {
-                              console.append("\n  P1 " + fromClientSalvo[i].getShipName() + " sunk.");
+                              console.append("\n    P1 " + fromClientSalvo[i].getShipName() + " sunk.");
                               console.setCaretPosition(console.getDocument().getLength());
                            }
                            if(fromClientSalvo[i].getEndGame())
                            {
-                              console.append("\n  P2 Wins!");
+                              console.append("\n\nP2 Wins!");
                               console.setCaretPosition(console.getDocument().getLength());
                            }
                            
